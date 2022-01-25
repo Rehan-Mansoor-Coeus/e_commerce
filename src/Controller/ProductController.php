@@ -142,6 +142,7 @@ class ProductController extends AbstractController
 
             $this->addFlash('success', 'product has been Updated!');
             return $this->redirect($this->generateUrl('product-record-user'));
+
         }
 
         return $this->render('product/edit.html.twig', [
