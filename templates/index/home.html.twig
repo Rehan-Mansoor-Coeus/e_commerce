@@ -1,0 +1,63 @@
+{% extends('/base.html.twig') %}
+
+{% block body %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Coeus Tweet App</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+           <li><a  lass="navbar-link" href="/home">Home</a></li>
+        </ul>
+    </div>
+    <style>
+      .make-me-sticky {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            padding: 0 15px;
+        }
+    </style>
+</nav>
+    <div class="row">
+        <div class="col-md-9">
+            <div class="mt-lg-5">
+                {#Posts#}
+                {% for data in result %}
+                    <div class="card m-5" id="{{ data.id }}">
+                        <img class="card-img-top" src="/uploads/{{ data.image }}" alt="Card image cap">
+                        <div class="card-body">
+                            <div class="card-title text-danger"><p>Author : {{ data.user.username }}</p></div>
+                            <p class="card-text">{{ data.tweet }}</p>
+                            <p class="card-text">
+                                <small class="text-muted">{{ data.createdAt|ago }}</small>
+                                <small class="float-right">
+                                    {% if is_granted('EDIT' , data) %}
+                                        <a href="tweet/edit/{{ data.id }}" class="text-primary"><i class=" fas fa-pencil-alt"></i></a>
+                                    {% endif %}
+                                    {% if is_granted('DELETE' , data) %}
+                                        <a href="/delete-tweet/{{ data.id }}" class="text-danger"><i class="fas fa-trash-alt"></i></a>
+                                    {% endif %}
+                                </small>
+                            </p>
+
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-3 sidebar-item">
+            <div class="nav flex-column nav-pills make-me-sticky" id="myTab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="/home" role="tab" aria-controls="v-pills-home" aria-selected="true">Home</a>
+
+                {% for data in result %}
+                <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#{{ data.id }}" role="tab" aria-controls="v-pills-profile" aria-selected="false">{{ data.tweet | slice(0,20)}}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
