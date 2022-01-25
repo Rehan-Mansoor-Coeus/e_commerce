@@ -35,6 +35,42 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                      with font-awesome or any other icon font library -->
+
+                <li class="nav-item">
+                    <a href="" class="nav-link">
+                        <i class="nav-icon fas fa-copy"></i>
+                        <p>
+                            Products
+                            <i class="fas fa-angle-left right"></i>
+                            <span class="badge badge-info right">6</span>
+                        </p>
+                    </a>
+
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/product" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Create</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/product/record/user" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Record</p>
+                            </a>
+                        </li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item">
+                                <a href="/product/record" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>All Record</p>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                    </ul>
+                </li>
+
                 {% if is_granted('ROLE_ADMIN') %}
                 <li class="nav-item">
                     <a href="" class="nav-link">

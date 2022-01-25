@@ -30,6 +30,7 @@ class ProductController extends AbstractController
         if($form->isSubmitted() && $form->isValid()){
             $data = $form->getData();
 
+
             if($request->files->get('product')['image']) {
                 $file = $request->files->get('product')['image'];
                 $upload_directory = $this->getParameter('upload_directory');
@@ -59,7 +60,7 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Route("/product-record", name="product-record")
+     * @Route("/product/record", name="product-record")
      */
     public function record(): Response
     {
@@ -75,7 +76,7 @@ class ProductController extends AbstractController
 
 
     /**
-     * @Route("/product-record-user", name="product-record-user")
+     * @Route("/product/record/user", name="product-record-user")
      */
     public function recordUser(): Response
     {
@@ -140,7 +141,7 @@ class ProductController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'product has been Updated!');
-            return $this->redirect($this->generateUrl('product-record'));
+            return $this->redirect($this->generateUrl('product-record-user'));
         }
 
         return $this->render('product/edit.html.twig', [

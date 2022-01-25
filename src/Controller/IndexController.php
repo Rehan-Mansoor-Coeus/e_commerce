@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controller;
+use App\Entity\Category;
 use App\Entity\Product;
 use Knp\Bundle\MarkdownBundle\MarkdownParserInterface;
 use Psr\Log\LoggerInterface;
@@ -45,9 +46,11 @@ class IndexController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $result = $em->getRepository(Product::class)->findAll();
+        $category = $em->getRepository(Category::class)->findAll();
 
         return $this->render('index/home.html.twig', [
-            'result' => $result
+            'result' => $result,
+            'category' => $category
         ]);
     }
 
