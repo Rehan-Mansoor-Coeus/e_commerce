@@ -10,17 +10,49 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
            <li><a  lass="navbar-link" href="/home">Home</a></li>
+
         </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+
+        <div class="dropdown">
+            <button type="button" class="btn btn-info" data-toggle="dropdown">
+                <i class="fa fa-shopping-cart" aria-hidden="true"></i> Cart <span class="badge badge-pill badge-danger">{{ app.session.get('cart') | length }}</span>
+            </button>
+            <div class="dropdown-menu">
+                <div class="row total-header-section">
+                    <div class="col-lg-6 col-sm-6 col-6">
+                        <i class="fa fa-shopping-cart" aria-hidden="true"></i> <span class="badge badge-pill badge-danger">{{ app.session.get('cart') | length }}</span>
+                    </div>
+                    <div class="col-lg-6 col-sm-6 col-6 total-section text-right">
+                        <p>Total: <span class="text-info">$2,978.24</span></p>
+                    </div>
+                </div>
+                {% for data in app.session.get('cart') %}
+                <div class="row cart-detail">
+                    <div class="col-lg-4 col-sm-4 col-4 cart-detail-img">
+                        <img src="/uploads/{{ data.image }}">
+                    </div>
+                    <div class="col-lg-8 col-sm-8 col-8 cart-detail-product">
+                        <p>{{ data.name }}</p>
+                        <span class="price text-info"> {{ data.price }}</span> <span class="count"> Quantity:{{ data.quantity }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="row">
+                    <div class="col-lg-12 col-sm-12 col-12 text-center checkout">
+                        <button class="btn btn-primary btn-block">Checkout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <style>
-      .make-me-sticky {
-            position: -webkit-sticky;
-            position: sticky;
-            top: 0;
-            padding: 0 15px;
-        }
-    </style>
+
 </nav>
+
     <div class="row">
         <div class="col-md-9">
             <div class="mt-lg-5">
@@ -33,7 +65,7 @@
                                 <div class="card-body">
                                     <h4 class="card-title">{{ data.name }} <small class="text-muted">{{ data.created|ago }}</small> </h4>
                                     <p class="card-text">{{ data.description }}</p>
-                                    <a href="#" class="btn btn-primary">Add To Card</a>
+                                    <a href="/add-to-cart/{{ data.id }}" class="btn btn-primary">Add To Card</a>
 
                                     <small class="float-right">
                                         {% if is_granted('EDIT' , data) %}
@@ -61,6 +93,9 @@
             </div>
         </div>
     </div>
+    <script>
 
+    </script>
 
 {% endblock %}
+
