@@ -116,6 +116,11 @@ class Order
      */
     protected $updated;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders")
+     */
+    private $user;
+
 
     /**
      * Set created
@@ -159,5 +164,17 @@ class Order
     public function getUpdated()
     {
         return $this->updated;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
     }
 }
