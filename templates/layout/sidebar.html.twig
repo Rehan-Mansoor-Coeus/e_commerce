@@ -70,8 +70,26 @@
 
                     </ul>
                 </li>
+{#                <li class="nav-item">#}
+{#                    <a href="/order/user" class="nav-link">#}
+{#                        <i class="nav-icon fas fa-copy"></i>#}
+{#                        <p>#}
+{#                            Orders#}
+{#                            <span class="badge badge-info right">6</span>#}
+{#                        </p>#}
+{#                    </a>#}
+{#                </li>#}
 
                 {% if is_granted('ROLE_ADMIN') %}
+                    <li class="nav-item">
+                        <a href="/order/record" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>
+                                All Orders
+                                <span class="badge badge-info right">6</span>
+                            </p>
+                        </a>
+                    </li>
                 <li class="nav-item">
                     <a href="" class="nav-link">
                         <i class="nav-icon fas fa-copy"></i>

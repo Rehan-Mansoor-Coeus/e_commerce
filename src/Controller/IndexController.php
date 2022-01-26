@@ -14,11 +14,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
-/**
- * Require ROLE_ADMIN for all the actions of this controller
- *
- * @IsGranted("ROLE_USER")
- */
 
 
 class IndexController extends AbstractController
