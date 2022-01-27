@@ -61,11 +61,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->tweet = new ArrayCollection();
         $this->role = new ArrayCollection();
         $this->products = new ArrayCollection();
         $this->orders = new ArrayCollection();
     }
+
+
 
 
     /**
@@ -242,6 +243,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $orders;
 
 
+
     /**
      * Set created
      * @param DateTime $created
@@ -351,4 +353,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
 }

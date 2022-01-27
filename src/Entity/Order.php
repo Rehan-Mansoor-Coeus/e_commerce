@@ -45,7 +45,7 @@ class Order
 
     public function __construct()
     {
-        $this->order_detail_id = new ArrayCollection();
+        $this->order_detail = new ArrayCollection();
     }
 
     /**
@@ -66,12 +66,12 @@ class Order
         return $this;
     }
 
-    public function removeOrderDetailId(OrderDetail $orderDetailId): self
+    public function removeOrderDetail(OrderDetail $orderDetail): self
     {
-        if ($this->order_detail_id->removeElement($orderDetailId)) {
+        if ($this->order_detail->removeElement($orderDetail)) {
             // set the owning side to null (unless already changed)
-            if ($orderDetailId->getOrderr() === $this) {
-                $orderDetailId->setOrderr(null);
+            if ($orderDetail->getOrderr() === $this) {
+                $orderDetail->setOrderr(null);
             }
         }
 
@@ -121,6 +121,10 @@ class Order
      */
     private $user;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders")
+     */
+    private $seller;
 
     /**
      * Set created
@@ -177,4 +181,18 @@ class Order
 
         return $this;
     }
+
+    public function getSeller(): ?User
+    {
+        return $this->seller;
+    }
+
+    public function setSeller(?User $seller): self
+    {
+        $this->seller = $seller;
+
+        return $this;
+    }
+
+
 }

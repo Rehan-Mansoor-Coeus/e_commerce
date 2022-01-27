@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Order;
+use App\Entity\User;
 use App\Entity\OrderDetail;
 use App\Entity\Product;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -11,6 +12,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
 class CartController extends AbstractController
@@ -41,6 +44,22 @@ class CartController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/email")
+     */
+    public function sendEmail(MailerInterface $mailer): Response
+    {
+        $email = (new Email())
+            ->from('rehanfaby36@gmail.com')
+            ->subject('Time for Symfony Mailer!')
+            ->text('Sending emails is fun again!')
+            ->html('<p>See Twig integration for better HTML integration!</p>');
+
+        $mailer->send($email);
+        return new Response(1);
+
+    }
+
 
     /**
      * @Route("/order", name="order")
@@ -48,51 +67,80 @@ class CartController extends AbstractController
      */
     public function create(Request $request)
     {
+        $user = $this->getUser();
         $session = new Session();
         $data = $request->request->all();
-
-        $order = new Order();
-
-
         $em = $this->getDoctrine()->getManager();
-        $order->setTotal($data['grand_total']);
-        $order->setStatus(0);
-        $order->setUser($this->getUser());
-        $order->setCreated(new \DateTime(date('Y-m-d')));
-        $em->persist($order);
-        $em->flush();
 
-        foreach ($session->get('cart') as $key=>$item){
-            $orderDetail = new OrderDetail();
+        $seller = [];
+        $total = [];
+
+        foreach ($session->get('cart') as $key=>$item) {
+            $em = $this->getDoctrine()->getManager();
             $product = $em->getRepository(Product::class)->find($key);
-
-            $em = $this->getDoctrine()->getManager();
-            $orderDetail->setProduct($product);
-            $orderDetail->setOrderr($order);
-            $orderDetail->setPrice($item['price']);
-            $orderDetail->setQuantiity($item['quantity']);
-            $em->persist($orderDetail);
             $em->flush();
 
+            $seller_id = $item['seller']->getId();
+
+                $cart[$seller_id][$key] = [
+                            "product" => $product,
+                            "quantity" => $item['quantity'],
+                            "buyyer" => $user,
+                            "seller" => $item['seller'],
+                ];
+                @$total[$seller_id] += $item['price'] * $item['quantity'];
+                $em->flush();
+        }
+//        dd($cart,$total);
+
+
+        foreach($cart as $ki=>$items){
+            dd($user,$cart);
             $em = $this->getDoctrine()->getManager();
-            $product->setStock($product->getStock() - $item['quantity']);
-            $em->persist($product);
+            $order = new Order();
+            $order->setTotal($total[$ki]);
+            $order->setStatus(0);
+            $order->setUser($user);
+//            $order->setSeller($items[$ki]['seller']);
+            $order->setCreated(new \DateTime(date('Y-m-d')));
+            $em->persist($order);
             $em->flush();
+
+
+            foreach ($items as $key=>$item){
+                $em = $this->getDoctrine()->getManager();
+                $orderDetail = new OrderDetail();
+                $product = $em->getRepository(Product::class)->find($key);
+
+                $orderDetail->setProduct($product);
+                $orderDetail->setOrderr($order);
+                $orderDetail->setPrice($product->getPrice());
+                $orderDetail->setQuantiity($item['quantity']);
+                $em->persist($orderDetail);
+                $em->flush();
+
+                $em = $this->getDoctrine()->getManager();
+                $product->setStock($product->getStock() - $item['quantity']);
+                $em->persist($product);
+                $em->flush();
+
+            }
+
         }
 
         $session->clear();
-        return $this->redirect('/complete/'.$order->getId());
+        return $this->redirect('/complete/');
 
 
     }
     /**
-     * @Route("complete/{id}", name="complete")
+     * @Route("/complete", name="complete")
      */
 
-    public function complete($id)
+    public function complete()
     {
         return $this->render('cart/complete.html.twig', [
-            'order' => $id
+            'order' => 12
         ]);
     }
 
@@ -159,6 +207,7 @@ class CartController extends AbstractController
                     "quantity" => 1,
                     "price" => $product->getPrice(),
                     "image" => $product->getImage(),
+                    "seller" => $product->getUser()
                 ]
             ];
             $session->set('cart',$cart);
@@ -186,6 +235,7 @@ class CartController extends AbstractController
             "quantity" => 1,
             "price" => $product->getPrice(),
             "image" => $product->getImage(),
+            "seller" => $product->getUser()
 
         ];
         $session->set('cart',$cart);
