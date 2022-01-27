@@ -67,14 +67,16 @@ class CartController extends AbstractController
      */
     public function create(Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
+        $product = $em->getRepository(User::class)->find(1);
+        dd($product);
         $user = $this->getUser();
         $session = new Session();
         $data = $request->request->all();
-        $em = $this->getDoctrine()->getManager();
 
         $seller = [];
         $total = [];
-
+//        dd($session->get('cart'));
         foreach ($session->get('cart') as $key=>$item) {
             $em = $this->getDoctrine()->getManager();
             $product = $em->getRepository(Product::class)->find($key);
@@ -88,7 +90,7 @@ class CartController extends AbstractController
                             "buyyer" => $user,
                             "seller" => $item['seller'],
                 ];
-                @$total[$seller_id] += $item['price'] * $item['quantity'];
+                $total[$seller_id] += $item['price'] * $item['quantity'];
                 $em->flush();
         }
 //        dd($cart,$total);
@@ -101,7 +103,7 @@ class CartController extends AbstractController
             $order->setTotal($total[$ki]);
             $order->setStatus(0);
             $order->setUser($user);
-//            $order->setSeller($items[$ki]['seller']);
+            $order->setSeller($items[$ki]['seller']);
             $order->setCreated(new \DateTime(date('Y-m-d')));
             $em->persist($order);
             $em->flush();
