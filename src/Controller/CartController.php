@@ -21,7 +21,7 @@ class CartController extends AbstractController
     public function index(): Response
     {
         $session = new Session();
-        $session->start();
+
 
         return $this->render('cart/index.html.twig', [
             'cart' => $session->get('cart'),
@@ -73,6 +73,11 @@ class CartController extends AbstractController
             $orderDetail->setQuantiity($item['quantity']);
             $em->persist($orderDetail);
             $em->flush();
+
+            $em = $this->getDoctrine()->getManager();
+            $product->setStock($product->getStock() - $item['quantity']);
+            $em->persist($product);
+            $em->flush();
         }
 
         $session->clear();
@@ -92,12 +97,59 @@ class CartController extends AbstractController
     }
 
     /**
+     * @Route("/cart/plus/{id}", name="cart-plus")
+     */
+
+    public function cartPlus($id)
+    {
+        $session = new Session();
+        $cart = $session->get('cart');
+
+        if (isset($cart[$id])) {
+            $cart[$id]['quantity'] ++;
+            $session->set('cart',$cart);
+        }
+
+        return $this->redirect('/cart');
+    }
+
+    /**
+     * @Route("/cart/minus/{id}", name="cart-minus")
+     */
+
+    public function cartMinus($id)
+    {
+        $session = new Session();
+        $cart = $session->get('cart');
+
+        if (isset($cart[$id])) {
+            $cart[$id]['quantity'] --;
+            $session->set('cart',$cart);
+        }
+
+        return $this->redirect('/cart');
+    }
+
+    /**
+     * @Route("/cart/remove/{id}", name="cart-remove")
+     */
+
+    public function cartRemove($id)
+    {
+        $session = new Session();
+        $cart = $session->get('cart');
+        unset($cart[$id]);
+        $session->set('cart',$cart);
+        return $this->redirect('/cart');
+
+    }
+
+    /**
      * @Route("add-to-cart/{id}", name="add-to-cart")
      */
 
     public function addToCart($id, Product $product){
         $session = new Session();
-        $session->start();
         $cart = $session->get('cart');
 
         if (!$cart) {
@@ -110,7 +162,8 @@ class CartController extends AbstractController
                 ]
             ];
             $session->set('cart',$cart);
-            return new JsonResponse(['cart' => $session->get('cart')]);
+            return $this->redirect('/home');
+//            return new JsonResponse(['cart' => $session->get('cart')]);
         }
 
         // if cart not empty then check if this product exist then increment quantity
@@ -123,6 +176,7 @@ class CartController extends AbstractController
             }
 
             $session->set('cart',$cart);
+            return $this->redirect('/home');
             return new JsonResponse(['cart' => $session->get('cart')]);
         }
 
@@ -135,6 +189,7 @@ class CartController extends AbstractController
 
         ];
         $session->set('cart',$cart);
+        return $this->redirect('/home');
         return new JsonResponse(['cart' => $session->get('cart')]);
 
 

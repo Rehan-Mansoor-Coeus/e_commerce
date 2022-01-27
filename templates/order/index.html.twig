@@ -1,10 +1,15 @@
 {% extends '/layout/base.html.twig' %}
 
-{% block title %}Tweet Record!{% endblock %}
+{% block title %}Order Record!{% endblock %}
 
 {% block body %}
-     {% for message in app.flashes('success') %}
+     {% for message in app.flashes('danger') %}
           <div class="alert alert-danger">
+               {{ message }}
+          </div>
+     {% endfor %}
+     {% for message in app.flashes('success') %}
+          <div class="alert alert-success">
                {{ message }}
           </div>
      {% endfor %}
@@ -30,7 +35,7 @@
                               <td>{{ data.id }}</td>
                               <td>{{ data.user.username }}</td>
                               <td>{{ data.total }}</td>
-                              <td>{{ data.status }}</td>
+                              <td>{{ array[data.status] }}</td>
                               <td>{{ data.created }}</td>
                               <td>
                                    <a href="/order/view/{{ data.id }}" class="btn btn-warning">View</a>

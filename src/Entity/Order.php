@@ -31,7 +31,7 @@ class Order
     /**
      * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="orderr")
      */
-    private $order_detail_id;
+    private $order_detail;
 
     /**
      * @ORM\Column(type="integer")
@@ -51,16 +51,16 @@ class Order
     /**
      * @return Collection|OrderDetail[]
      */
-    public function getOrderDetailId(): Collection
+    public function getOrderDetail(): Collection
     {
-        return $this->order_detail_id;
+        return $this->order_detail;
     }
 
-    public function addOrderDetailId(OrderDetail $orderDetailId): self
+    public function addOrderDetail(OrderDetail $orderDetail): self
     {
-        if (!$this->order_detail_id->contains($orderDetailId)) {
-            $this->order_detail_id[] = $orderDetailId;
-            $orderDetailId->setOrderr($this);
+        if (!$this->order_detail->contains($orderDetail)) {
+            $this->order_detail[] = $orderDetail;
+            $orderDetail->setOrderr($this);
         }
 
         return $this;

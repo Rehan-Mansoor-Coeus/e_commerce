@@ -18,13 +18,22 @@
                 </thead>
                 <tbody>
                 {% set total = 0 %}
-                {% for data in app.session.get('cart') %}
+                {% for key,data in app.session.get('cart') %}
                 <tr>
                     <td>{{ 1 }}</td>
                     <td><img width="100px" src="/uploads/{{ data.image }}">{{ data.name }}</td>
-                    <td>{{ data.quantity }}</td>
+                    <td>
+                        <div class="qty-group">
+                            <a href="/cart/minus/{{ key }}" class="btn btn-warning">-</a>
+                            <input readonly="" type="text" name="quantity" size="10" id="updates_40341838725269" value="{{ data.quantity }}">
+                            <a class="btn btn-success" href="/cart/plus/{{ key }}">+
+                            </a>
+                        </div>
+                    </td>
                     <td>{{ data.price }}</td>
-                    <td></td>
+                    <td>
+                        <a href="/cart/remove/{{ key }}" class="btn btn-danger">Remove</a>
+                    </td>
                 </tr>
                     {% set total = total + (data.price * data.quantity) %}
                 {% endfor %}

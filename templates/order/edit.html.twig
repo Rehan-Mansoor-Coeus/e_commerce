@@ -1,0 +1,31 @@
+{% extends '/layout/base.html.twig' %}
+
+{% block title %}Order Edit!{% endblock %}
+
+{% block body %}
+     {% for message in app.flashes('success') %}
+          <div class="alert alert-danger">
+               {{ message }}
+          </div>
+     {% endfor %}
+     <div class="card">
+          <div class="card-header">
+               <header>Edit Order</header>
+               <a href="/order/view/{{ result.id }}" class="float-right btn btn-info">View Order</a>
+          </div>
+          <div class="card-body">
+               <form action="/order/update/{{ result.id }}" method="post">
+                  <label>Status</label>
+                    <select class="form-control" name="status">
+                        {% for key,item in array %}
+                         <option value="{{ key }}" {{ result.status == key ? "selected" : "" }}>{{ item }}</option>
+                        {% endfor %}
+                    </select>
+                    <hr>
+                    <button type="submit" class="btn btn-success">Update</button>
+               </form>
+          </div>
+
+     </div>
+
+{% endblock %}

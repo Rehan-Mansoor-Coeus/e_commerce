@@ -167,6 +167,11 @@ class Product
      */
     private $orderDetails;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $stock;
+
     public function __construct()
     {
         $this->orderDetails = new ArrayCollection();
@@ -243,6 +248,18 @@ class Product
                 $orderDetail->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStock(): ?int
+    {
+        return $this->stock;
+    }
+
+    public function setStock(int $stock): self
+    {
+        $this->stock = $stock;
 
         return $this;
     }
