@@ -22,7 +22,6 @@
                     <thead>
                     <tr class="bg-danger">
                          <th>ID</th>
-                         <th>Seller</th>
                          <th>Buyer</th>
                          <th>Total</th>
                          <th>Status</th>
@@ -34,7 +33,6 @@
                     {% for data in result %}
                          <tr>
                               <td>{{ data.id }}</td>
-                              <td>{{ data.seller.username }}</td>
                               <td>{{ data.user.username }}</td>
                               <td>{{ data.total }}</td>
                               <td>{{ array[data.status] }}</td>

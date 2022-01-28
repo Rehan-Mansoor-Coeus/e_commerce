@@ -43,6 +43,7 @@ security:
 
     access_control:
          - { path: ^/admin, roles: ROLE_SELLER }
+         - { path: ^/order, roles: ROLE_SELLER }
          - { path: ^/category , roles : [ROLE_ADMIN] }
 
 when@test:

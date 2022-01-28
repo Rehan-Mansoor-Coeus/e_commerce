@@ -26,6 +26,24 @@ class OrderController extends AbstractController
         ]);
     }
     /**
+     * @Route("/order/record/user", name="order-record-user")
+     */
+    public function indexUser(): Response
+    {
+        $array = ['pending','complete','Rejected'];
+        $em = $this->getDoctrine()->getManager();
+        $result = $em->getRepository(Order::class)->findBy([
+            'seller'=>$this->getUser()
+        ]);
+
+        return $this->render('order/user.html.twig', [
+            'result' => $result,
+            'array' => $array,
+        ]);
+    }
+
+
+    /**
      * @Route("/order/view/{id}", name="order-view")
      */
     public function view(Order $order): Response

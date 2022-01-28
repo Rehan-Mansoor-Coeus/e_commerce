@@ -50,9 +50,9 @@ class CartController extends AbstractController
     public function sendEmail(MailerInterface $mailer): Response
     {
         $email = (new Email())
-            ->from('rehanfaby36@gmail.com')
-            ->subject('Time for Symfony Mailer!')
-            ->text('Sending emails is fun again!')
+            ->from('rehan.mansoor@coeus-solutions.de')
+            ->to('rehanfaby36@gmail.com')
+            ->subject('Order PLaced!')
             ->html('<p>See Twig integration for better HTML integration!</p>');
 
         $mailer->send($email);
@@ -62,73 +62,83 @@ class CartController extends AbstractController
 
 
     /**
-     * @Route("/order", name="order")
+     * @Route("/checkout/complete", name="checkout-commplete")
      * @IsGranted("ROLE_USER")
      */
-    public function create(Request $request)
+    public function create(Request $request , MailerInterface $mailer)
     {
         $em = $this->getDoctrine()->getManager();
-        $product = $em->getRepository(User::class)->find(1);
-        dd($product);
         $user = $this->getUser();
         $session = new Session();
-        $data = $request->request->all();
 
         $seller = [];
         $total = [];
-//        dd($session->get('cart'));
+
+        $index = 0;
+
         foreach ($session->get('cart') as $key=>$item) {
-            $em = $this->getDoctrine()->getManager();
+            $seller = $em->getRepository(User::class)->find($item['seller']);
             $product = $em->getRepository(Product::class)->find($key);
-            $em->flush();
 
-            $seller_id = $item['seller']->getId();
-
-                $cart[$seller_id][$key] = [
+                $cart[$item['seller']][$index] = [
                             "product" => $product,
                             "quantity" => $item['quantity'],
                             "buyyer" => $user,
-                            "seller" => $item['seller'],
+                            "seller" => $seller,
                 ];
-                $total[$seller_id] += $item['price'] * $item['quantity'];
+                @$total[$item['seller']] += $item['price'] * $item['quantity'];
                 $em->flush();
+                $index++;
         }
-//        dd($cart,$total);
 
-
+        $index2 = 0;
         foreach($cart as $ki=>$items){
-            dd($user,$cart);
-            $em = $this->getDoctrine()->getManager();
+
             $order = new Order();
             $order->setTotal($total[$ki]);
             $order->setStatus(0);
             $order->setUser($user);
-            $order->setSeller($items[$ki]['seller']);
+            $order->setSeller($items[$index2]['seller']);
             $order->setCreated(new \DateTime(date('Y-m-d')));
             $em->persist($order);
             $em->flush();
 
 
             foreach ($items as $key=>$item){
-                $em = $this->getDoctrine()->getManager();
-                $orderDetail = new OrderDetail();
-                $product = $em->getRepository(Product::class)->find($key);
 
-                $orderDetail->setProduct($product);
+                $orderDetail = new OrderDetail();
+                $orderDetail->setProduct($item['product']);
                 $orderDetail->setOrderr($order);
-                $orderDetail->setPrice($product->getPrice());
+                $orderDetail->setPrice($item['product']->getPrice());
                 $orderDetail->setQuantiity($item['quantity']);
                 $em->persist($orderDetail);
                 $em->flush();
 
-                $em = $this->getDoctrine()->getManager();
                 $product->setStock($product->getStock() - $item['quantity']);
                 $em->persist($product);
                 $em->flush();
-
+                $seller = $items[$index2]['seller'];
+                $index2 ++;
             }
+            $email = (new Email())
+                ->from('rehan.mansoor@coeus-solutions.de')
+                ->to($user->getEmail())
+                ->subject('Order Placed!')
+                ->html('<h1>Dear '.$user->getUsername().' !</h1><hr><p>You has placed an order with Order No # '.$order->getId().'</p>');
 
+            $mailer->send($email);
+
+
+            $email = (new Email())
+                ->from('rehan.mansoor@coeus-solutions.de')
+                ->to($seller->getEmail())
+                ->subject('Order Received!')
+                ->html('<h1>Dear '.$seller->getUsername().' !</h1><hr><p>You has received an order with Order No # '.$order->getId().'</p>');
+
+            $mailer->send($email);
         }
+
+
 
         $session->clear();
         return $this->redirect('/complete/');
@@ -209,7 +219,7 @@ class CartController extends AbstractController
                     "quantity" => 1,
                     "price" => $product->getPrice(),
                     "image" => $product->getImage(),
-                    "seller" => $product->getUser()
+                    "seller" => $product->getUser()->getId()
                 ]
             ];
             $session->set('cart',$cart);
@@ -237,7 +247,7 @@ class CartController extends AbstractController
             "quantity" => 1,
             "price" => $product->getPrice(),
             "image" => $product->getImage(),
-            "seller" => $product->getUser()
+            "seller" => $product->getUser()->getId()
 
         ];
         $session->set('cart',$cart);
