@@ -2,23 +2,21 @@
 
 namespace App\Controller;
 use App\Entity\Category;
+use App\Entity\Order;
 use App\Entity\Product;
+use Doctrine\ORM\Query\AST\LikeExpression;
 use Knp\Bundle\MarkdownBundle\MarkdownParserInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 use App\Acme\TestBundle\AcmeTestBundle;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
-/**
- * Require ROLE_ADMIN for all the actions of this controller
- *
- * @IsGranted("ROLE_USER")
- */
 
 
 class IndexController extends AbstractController
@@ -38,7 +36,39 @@ class IndexController extends AbstractController
             'controller_name' => 'IndexController',
         ]);
     }
+    /**
+     * @Route("/products/{id}", name="product-category")
+     */
+    public function productCategory(Category $category): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $result = $em->getRepository(Product::class)->findBy([
+            'category' => $category
+        ]);
+        $category = $em->getRepository(Category::class)->findAll();
 
+        return $this->render('index/home.html.twig', [
+            'result' => $result,
+            'category' => $category
+        ]);
+    }
+    /**
+     * @Route("/search", name="search")
+     */
+    public function search(Request $request): Response
+    {
+        $search = $request->request->all()['search'];
+        $em = $this->getDoctrine()->getManager();
+        $result = $em->getRepository(Product::class)->findBy([
+            'name' => $search
+        ]);
+        $category = $em->getRepository(Category::class)->findAll();
+
+        return $this->render('index/home.html.twig', [
+            'result' => $result,
+            'category' => $category
+        ]);
+    }
     /**
      * @Route("/home", name="home")
      */
@@ -50,6 +80,25 @@ class IndexController extends AbstractController
 
         return $this->render('index/home.html.twig', [
             'result' => $result,
+            'category' => $category
+        ]);
+    }
+
+    /**
+     * @Route("/account", name="account")
+     */
+    public function account(): Response
+    {
+        $array = ['pending','complete','Rejected'];
+        $em = $this->getDoctrine()->getManager();
+        $category = $em->getRepository(Category::class)->findAll();
+        $result = $em->getRepository(Order::class)->findBy([
+            'user'=>$this->getUser()
+        ]);
+
+        return $this->render('index/account.html.twig', [
+            'result' => $result,
+            'array' => $array,
             'category' => $category
         ]);
     }

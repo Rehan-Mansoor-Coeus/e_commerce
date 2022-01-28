@@ -1,43 +1,46 @@
 {% extends '/layout/base.html.twig' %}
 
-{% block title %}Product Record!{% endblock %}
+{% block title %}Order Record!{% endblock %}
 
 {% block body %}
-     {% for message in app.flashes('success') %}
+     {% for message in app.flashes('danger') %}
           <div class="alert alert-danger">
+               {{ message }}
+          </div>
+     {% endfor %}
+     {% for message in app.flashes('success') %}
+          <div class="alert alert-success">
                {{ message }}
           </div>
      {% endfor %}
      <div class="card">
           <div class="card-header">
-               <header>{{ header   }}</header>
-               <a class="btn btn-warning float-right" href="/product">Create</a>
+               <header>All Orders</header>
           </div>
           <div class="card-body">
                <table class="table table-bordered table-striped">
                     <thead>
                     <tr class="bg-danger">
                          <th>ID</th>
-                         <th>Name</th>
-                         <th>Price</th>
-                         <th>Category</th>
-                         <th>Image</th>
+                         <th>Buyer</th>
+                         <th>Total</th>
+                         <th>Status</th>
                          <th>Date</th>
                          <th>Action</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for data in product %}
+                    {% for data in result %}
                          <tr>
                               <td>{{ data.id }}</td>
-                              <td>{{ data.name }}</td>
-                              <td>{{ data.price }}</td>
-                              <td>{{ data.category.name }}</td>
-                              <td><a href="/uploads/{{ data.image }}" target="_blank"><img src="/uploads/{{ data.image }}" width="50px" alt="image"></a></td>
+                              <td>{{ data.user.username }}</td>
+                              <td>{{ data.total }}</td>
+                              <td>{{ array[data.status] }}</td>
                               <td>{{ data.created }}</td>
                               <td>
-                                   <a href="/product/edit/{{ data.id }}" class="btn btn-primary">Edit</a>
-                                   <a href="/product/delete/{{ data.id }}" class="btn btn-danger">Del</a>
+                                   <a href="/order/view/{{ data.id }}" class="btn btn-warning">View</a>
+                                   <a href="/order/edit/{{ data.id }}" class="btn btn-primary">Edit</a>
+                                   <a href="/order/delete/{{ data.id }}" class="btn btn-danger">Del</a>
                               </td>
                          </tr
                     {% endfor %}

@@ -1,6 +1,6 @@
 {% extends '/layout/base.html.twig' %}
 
-{% block title %}Tweet Record!{% endblock %}
+{% block title %}Product Record!{% endblock %}
 
 {% block body %}
      {% for message in app.flashes('success') %}
@@ -11,7 +11,7 @@
      <div class="card">
           <div class="card-header">
                <header>{{ header   }}</header>
-               <a class="btn btn-warning float-right" href="/tweet">Create</a>
+               <a class="btn btn-warning float-right" href="/Product">Create</a>
           </div>
           <div class="card-body">
                <table class="table table-bordered table-striped">
@@ -25,7 +25,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for data in tweet %}
+                    {% for data in Product %}
                          <tr>
                               <td>{{ data.id }}</td>
                               <td>{{ data.tweet | markdown }}</td>
