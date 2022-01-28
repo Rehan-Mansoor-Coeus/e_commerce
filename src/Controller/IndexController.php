@@ -52,30 +52,21 @@ class IndexController extends AbstractController
             'category' => $category
         ]);
     }
-    /**
-     * @Route("/search", name="search")
-     */
-    public function search(Request $request): Response
-    {
-        $search = $request->request->all()['search'];
-        $em = $this->getDoctrine()->getManager();
-        $result = $em->getRepository(Product::class)->findBy([
-            'name' => $search
-        ]);
-        $category = $em->getRepository(Category::class)->findAll();
 
-        return $this->render('index/home.html.twig', [
-            'result' => $result,
-            'category' => $category
-        ]);
-    }
     /**
      * @Route("/home", name="home")
      */
-    public function home(): Response
+    public function home(Request $request): Response
     {
+        $q = $request->query->get('search');
         $em = $this->getDoctrine()->getManager();
-        $result = $em->getRepository(Product::class)->findAll();
+
+        if($q){
+            $result = $em->getRepository(Product::class)->findAllWithSearch($q);
+        }else{
+            $result = $em->getRepository(Product::class)->findAll();
+        }
+
         $category = $em->getRepository(Category::class)->findAll();
 
         return $this->render('index/home.html.twig', [
@@ -119,17 +110,6 @@ class IndexController extends AbstractController
     }
 
 
-    /**
-     * @Route("/acme", name="acme")
-     */
-    public function acme(AcmeTestBundle $acme)
-    {
-        $acme = $acme->get('https://api.publicapis.org/entries');
-        $data = $acme['entries'];
-        dd(array_slice($data,1,10));
-
-        return new Response('logger practice');
-    }
 
     /**
      * @Route("/markdown", name="markdown")

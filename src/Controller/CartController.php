@@ -151,9 +151,7 @@ class CartController extends AbstractController
 
     public function complete()
     {
-        return $this->render('cart/complete.html.twig', [
-            'order' => 12
-        ]);
+        return $this->render('cart/complete.html.twig');
     }
 
     /**
@@ -209,6 +207,7 @@ class CartController extends AbstractController
      */
 
     public function addToCart($id, Product $product){
+
         $session = new Session();
         $cart = $session->get('cart');
 
@@ -223,8 +222,8 @@ class CartController extends AbstractController
                 ]
             ];
             $session->set('cart',$cart);
-            return $this->redirect('/home');
-//            return new JsonResponse(['cart' => $session->get('cart')]);
+//            return $this->redirect('/home');
+            return new JsonResponse(['cart' => $session->get('cart')]);
         }
 
         // if cart not empty then check if this product exist then increment quantity
@@ -237,7 +236,7 @@ class CartController extends AbstractController
             }
 
             $session->set('cart',$cart);
-            return $this->redirect('/home');
+//            return $this->redirect('/home');
             return new JsonResponse(['cart' => $session->get('cart')]);
         }
 
@@ -251,7 +250,7 @@ class CartController extends AbstractController
 
         ];
         $session->set('cart',$cart);
-        return $this->redirect('/home');
+//        return $this->redirect('/home');
         return new JsonResponse(['cart' => $session->get('cart')]);
 
 

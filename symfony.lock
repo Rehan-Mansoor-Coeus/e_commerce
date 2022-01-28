@@ -94,8 +94,14 @@
     "gedmo/doctrine-extensions": {
         "version": "v3.5.0"
     },
+    "knplabs/knp-components": {
+        "version": "v3.5.0"
+    },
     "knplabs/knp-markdown-bundle": {
         "version": "1.9.0"
+    },
+    "knplabs/knp-paginator-bundle": {
+        "version": "v5.8.0"
     },
     "knplabs/knp-time-bundle": {
         "version": "1.17.0"

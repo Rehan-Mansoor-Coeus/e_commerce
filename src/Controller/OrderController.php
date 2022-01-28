@@ -4,31 +4,37 @@ namespace App\Controller;
 
 use App\Entity\Order;
 use App\Entity\OrderDetail;
+use Knp\Component\Pager\PaginatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Acme\TestBundle\AcmeTestBundle;
 
 class OrderController extends AbstractController
 {
     /**
      * @Route("/order/record", name="order-record")
+     * @IsGranted("ROLE_ADMIN")
      */
-    public function index(): Response
+    public function index(AcmeTestBundle $acme , PaginatorInterface $paginator , Request $request): Response
     {
         $array = ['pending','complete','Rejected'];
         $em = $this->getDoctrine()->getManager();
         $result = $em->getRepository(Order::class)->findAll();
 
+        $pagination = $acme->get($result,$paginator,$request);
+
         return $this->render('order/index.html.twig', [
-            'result' => $result,
+            'pagination' => $pagination,
             'array' => $array,
         ]);
     }
     /**
      * @Route("/order/record/user", name="order-record-user")
      */
-    public function indexUser(): Response
+    public function indexUser(AcmeTestBundle $acme , PaginatorInterface $paginator , Request $request): Response
     {
         $array = ['pending','complete','Rejected'];
         $em = $this->getDoctrine()->getManager();
@@ -36,8 +42,10 @@ class OrderController extends AbstractController
             'seller'=>$this->getUser()
         ]);
 
+        $pagination = $acme->get($result,$paginator,$request);
+
         return $this->render('order/user.html.twig', [
-            'result' => $result,
+            'pagination' => $pagination,
             'array' => $array,
         ]);
     }
@@ -75,7 +83,7 @@ class OrderController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Order has been Updated!');
-            return $this->redirectToRoute('order-record');
+            return $this->redirectToRoute('order-record-user');
     }
     /**
      * @Route("/order/delete/{id}", name="order-delete")

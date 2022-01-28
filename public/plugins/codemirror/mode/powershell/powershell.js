@@ -79,7 +79,7 @@ CodeMirror.defineMode('powershell', function() {
     new RegExp('Get-(Acl|Alias|AuthenticodeSignature|ChildItem|Command|ComputerRestorePoint|Content|ControlPanelItem|Counter|Credential'
       + '|Culture|Date|Event|EventLog|EventSubscriber|ExecutionPolicy|FormatData|Help|History|Host|HotFix|Item|ItemProperty|Job'
       + '|Location|Member|Module|PfxCertificate|Process|PSBreakpoint|PSCallStack|PSDrive|PSProvider|PSSession|PSSessionConfiguration'
-      + '|PSSnapin|Random|Service|TraceSource|Transaction|TypeData|UICulture|Unique|Variable|Verb|WinEvent|WmiObject)'),
+      + '|PSSnapin|Random|Acme|TraceSource|Transaction|TypeData|UICulture|Unique|Variable|Verb|WinEvent|WmiObject)'),
     /Group-Object/,
     /Import-(Alias|Clixml|Counter|Csv|LocalizedData|Module|PSSession)/,
     /ImportSystemModules/,
@@ -89,7 +89,7 @@ CodeMirror.defineMode('powershell', function() {
     /Measure-(Command|Object)/,
     /Move-Item(Property)?/,
     new RegExp('New-(Alias|Event|EventLog|Item(Property)?|Module|ModuleManifest|Object|PSDrive|PSSession|PSSessionConfigurationFile'
-      + '|PSSessionOption|PSTransportOption|Service|TimeSpan|Variable|WebServiceProxy|WinEvent)'),
+      + '|PSSessionOption|PSTransportOption|Acme|TimeSpan|Variable|WebServiceProxy|WinEvent)'),
     /Out-(Default|File|GridView|Host|Null|Printer|String)/,
     /Pause/,
     /(Pop|Push)-Location/,
@@ -107,7 +107,7 @@ CodeMirror.defineMode('powershell', function() {
     /Select-(Object|String|Xml)/,
     /Send-MailMessage/,
     new RegExp('Set-(Acl|Alias|AuthenticodeSignature|Content|Date|ExecutionPolicy|Item(Property)?|Location|PSBreakpoint|PSDebug' +
-               '|PSSessionConfiguration|Service|StrictMode|TraceSource|Variable|WmiInstance)'),
+               '|PSSessionConfiguration|Acme|StrictMode|TraceSource|Variable|WmiInstance)'),
     /Show-(Command|ControlPanelItem|EventLog)/,
     /Sort-Object/,
     /Split-Path/,

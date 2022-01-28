@@ -15,7 +15,7 @@
      {% endfor %}
      <div class="card">
           <div class="card-header">
-               <header>All Orders</header>
+               <header>All Orders ({{ pagination.getTotalItemCount }})</header>
           </div>
           <div class="card-body">
                <table class="table table-bordered table-striped">
@@ -31,7 +31,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for data in result %}
+                    {% for data in pagination %}
                          <tr>
                               <td>{{ data.id }}</td>
                               <td>{{ data.seller.username }}</td>
@@ -48,6 +48,9 @@
                     {% endfor %}
                     </tbody>
                </table>
+               <div class="navigation float-right">
+                    {{ knp_pagination_render(pagination) }}
+               </div>
           </div>
 
      </div>
