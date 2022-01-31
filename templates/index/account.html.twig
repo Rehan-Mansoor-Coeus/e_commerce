@@ -44,7 +44,7 @@
         </div>
         <div class="col-md-3 sidebar-item">
             <div class="nav flex-column nav-pills make-me-sticky" id="myTab" role="tablist" aria-orientation="vertical">
-                <a class="nav-link active" href="/home">Home</a>
+                <a class="nav-link active" href="{{ path('home') }}">Home</a>
 
                 {% for data in category %}
                 <a class="nav-link"  href="/products/{{ data.id }}">{{ data.name | slice(0,20)}}</a>

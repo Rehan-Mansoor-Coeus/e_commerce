@@ -6,7 +6,7 @@
 
     <div class="row mt-5">
         <div class="col-md-12">
-            <form action="/checkout/complete" method="post" class="form-horizontal">
+            <form action="{{ {{ path('checkout-complete') }} }}" method="post" class="form-horizontal">
                 <div class="row ml-1">
                     <div class="col-billing col-md-7" style="padding:5% 6% 4em 0;">
                         <div class="login-form" style="float:right;max-width: 572px;">
@@ -51,7 +51,7 @@
                                 <div class="col-md-12"></div>
                             </div>
                             <button type="submit" class="btn btn-success btn-lg" style="">Order Now</button>
-                            <a class="ml-4 step__footer__previous-link" href="/cart">
+                            <a class="ml-4 step__footer__previous-link" href="{{ path('cart') }}">
                                 <span class="btn btn-default">Return to cart</span>
                             </a>
                         </div>

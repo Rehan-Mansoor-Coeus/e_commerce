@@ -11,7 +11,7 @@
      <div class="card">
           <div class="card-header">
                <header>{{ header   }}</header>
-               <a class="btn btn-warning float-right" href="/product">Create</a>
+               <a class="btn btn-warning float-right" href="{{ path('product') }}">Create</a>
           </div>
           <div class="card-body">
                <table class="table table-bordered table-striped">
@@ -35,11 +35,11 @@
                               <td>{{ data.price }}</td>
                               <td>{{ data.stock }}</td>
                               <td>{{ data.category.name }}</td>
-                              <td><a href="/uploads/{{ data.image }}" target="_blank"><img src="/uploads/{{ data.image }}" width="50px" alt="image"></a></td>
+                              <td><a href="{{ asset('uploads/') }}{{ data.image }}" target="_blank"><img src="/uploads/{{ data.image }}" width="50px" alt="image"></a></td>
                               <td>{{ data.created }}</td>
                               <td>
-                                   <a href="/product/edit/{{ data.id }}" class="btn btn-primary">Edit</a>
-                                   <a href="/product/delete/{{ data.id }}" class="btn btn-danger">Del</a>
+                                   <a href="{{ path('product-edit' , {id:data.id}) }}" class="btn btn-primary">Edit</a>
+                                   <a href="{{ path('delete-product' , {id:data.id}) }}" class="btn btn-danger">Del</a>
                               </td>
                          </tr
                     {% endfor %}

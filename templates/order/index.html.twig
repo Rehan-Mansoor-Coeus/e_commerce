@@ -40,11 +40,11 @@
                               <td>{{ array[data.status] }}</td>
                               <td>{{ data.created }}</td>
                               <td>
-                                   <a href="/order/view/{{ data.id }}" class="btn btn-warning">View</a>
+                                   <a href="{{ path('order-view' , {id:data.id}) }}" class="btn btn-warning">View</a>
                                    {% if(data.status == 0) %}
-                                   <a href="/order/edit/{{ data.id }}" class="btn btn-primary">Edit</a>
+                                        <a href="{{ path('order-edit' , {id:data.id}) }}" class="btn btn-primary">Edit</a>
                                    {% endif %}
-{#                                   <a href="/order/delete/{{ data.id }}" class="btn btn-danger">Del</a>#}
+                                   {# <a href="{{ path('order-delete' , {id:data.id}) }}" class="btn btn-danger">Del</a>#}
                               </td>
                          </tr
                     {% endfor %}

@@ -95,8 +95,17 @@ class RegisterController extends AbstractController
     public function remove(int $id){
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository(User::class)->find($id);
-        $em->remove($user);
-        $em->flush();
+
+//        dd($user);
+        try{
+            $em->remove($user);
+            $em->flush();
+        } catch (\Exception $ex) {
+
+            $exception_message = $ex->getPrevious()->getCode();
+            return $this->render('AppBundle:Errors:error.html.twig', array('error' => $exception_message));
+
+        }
 
         $this->addFlash('success', 'User has been Deleted!');
         return $this->redirectToRoute('users');
