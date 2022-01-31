@@ -6,6 +6,7 @@ use App\Entity\Order;
 use App\Entity\User;
 use App\Entity\OrderDetail;
 use App\Entity\Product;
+use App\Service\MailService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -65,7 +66,7 @@ class CartController extends AbstractController
      * @Route("/checkout/complete", name="checkout-commplete")
      * @IsGranted("ROLE_USER")
      */
-    public function create(Request $request , MailerInterface $mailer)
+    public function create(Request $request , MailerInterface $mailer, MailService $mail)
     {
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
@@ -114,28 +115,31 @@ class CartController extends AbstractController
                 $em->persist($orderDetail);
                 $em->flush();
 
+                $product = $item['product'];
                 $product->setStock($product->getStock() - $item['quantity']);
                 $em->persist($product);
                 $em->flush();
                 $seller = $items[$index2]['seller'];
                 $index2 ++;
             }
-            $email = (new Email())
-                ->from('rehan.mansoor@coeus-solutions.de')
-                ->to($user->getEmail())
-                ->subject('Order Placed!')
-                ->html('<h1>Dear '.$user->getUsername().' !</h1><hr><p>You has placed an order with Order No # '.$order->getId().'</p>');
 
-            $mailer->send($email);
+//            mail to buyer
+            $to = $user->getEmail();
+            $customer = $user->getUsername();
+            $order_no = $order->getId();
+            $subject = "Order Placed ..!";
+            $message = "<h1>Dear $customer !</h1><hr><p>Your Order No # $order_no has been placed successfully  </p>";
+            $mail->sendMail($to,$subject,$message,$mailer);
 
+//            mail to Seller
 
-            $email = (new Email())
-                ->from('rehan.mansoor@coeus-solutions.de')
-                ->to($seller->getEmail())
-                ->subject('Order Received!')
-                ->html('<h1>Dear '.$seller->getUsername().' !</h1><hr><p>You has received an order with Order No # '.$order->getId().'</p>');
+            $to = $seller->getEmail();
+            $customer = $seller->getUsername();
+            $order_no = $order->getId();
+            $subject = "Order Received..!";
+            $message = "<h1>Dear $customer !</h1><hr><p>YOu have received an order with Order No # $order_no  </p>";
+            $mail->sendMail($to,$subject,$message,$mailer);
 
-            $mailer->send($email);
         }
 
 

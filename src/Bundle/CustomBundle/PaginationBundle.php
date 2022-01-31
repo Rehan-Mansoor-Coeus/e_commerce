@@ -1,11 +1,11 @@
 <?php
 
-namespace  App\Acme\TestBundle;
+namespace  App\Bundle\CustomBundle;
 
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class AcmeTestBundle extends Bundle
+class PaginationBundle extends Bundle
 {
     public function get($result ,$paginator, $request ){
         $pagination = $paginator->paginate(

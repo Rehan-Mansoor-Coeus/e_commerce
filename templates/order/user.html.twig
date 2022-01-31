@@ -39,8 +39,10 @@
                               <td>{{ data.created }}</td>
                               <td>
                                    <a href="/order/view/{{ data.id }}" class="btn btn-warning">View</a>
+                                   {% if(data.status == 0) %}
                                    <a href="/order/edit/{{ data.id }}" class="btn btn-primary">Edit</a>
-                                   <a href="/order/delete/{{ data.id }}" class="btn btn-danger">Del</a>
+                                   {% endif %}
+{#                                   <a href="/order/delete/{{ data.id }}" class="btn btn-danger">Del</a>#}
                               </td>
                          </tr
                     {% endfor %}
