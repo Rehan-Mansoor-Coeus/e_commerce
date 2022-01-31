@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Form\ProductType;
+use App\Repository\ProductRepository;
 use Doctrine\DBAL\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,10 +63,11 @@ class ProductController extends AbstractController
     /**
      * @Route("/product/record", name="product-record")
      */
-    public function record(): Response
+    public function record(ProductRepository $product): Response
     {
         $em = $this->getDoctrine()->getManager();
         $result = $em->getRepository(product::class)->findAll();
+        $result = $product->findAll();
         $header = "products Records";
         return $this->render('product/record.html.twig', [
             'product' => $result,
@@ -78,11 +80,11 @@ class ProductController extends AbstractController
     /**
      * @Route("/product/record/user", name="product-record-user")
      */
-    public function recordUser(): Response
+    public function recordUser(ProductRepository $product): Response
     {
 
         $em = $this->getDoctrine()->getManager();
-        $result = $em->getRepository(product::class)->findBy([
+        $result = $product->findBy([
             'user' => $this->getUser()
         ]);
         $header = "My products Records";

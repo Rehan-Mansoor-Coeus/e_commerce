@@ -6,6 +6,8 @@ use App\Entity\Order;
 use App\Entity\User;
 use App\Entity\OrderDetail;
 use App\Entity\Product;
+use App\Repository\ProductRepository;
+use App\Repository\UserRepository;
 use App\Service\MailService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,8 +27,6 @@ class CartController extends AbstractController
     public function index(): Response
     {
         $session = new Session();
-
-
         return $this->render('cart/index.html.twig', [
             'cart' => $session->get('cart'),
         ]);
@@ -46,27 +46,10 @@ class CartController extends AbstractController
     }
 
     /**
-     * @Route("/email")
-     */
-    public function sendEmail(MailerInterface $mailer): Response
-    {
-        $email = (new Email())
-            ->from('rehan.mansoor@coeus-solutions.de')
-            ->to('rehanfaby36@gmail.com')
-            ->subject('Order PLaced!')
-            ->html('<p>See Twig integration for better HTML integration!</p>');
-
-        $mailer->send($email);
-        return new Response(1);
-
-    }
-
-
-    /**
      * @Route("/checkout/complete", name="checkout-commplete")
      * @IsGranted("ROLE_USER")
      */
-    public function create(Request $request , MailerInterface $mailer, MailService $mail)
+    public function create(Request $request , MailerInterface $mailer, MailService $mail , UserRepository $userRepository , ProductRepository $productRepository)
     {
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
@@ -78,8 +61,8 @@ class CartController extends AbstractController
         $index = 0;
 
         foreach ($session->get('cart') as $key=>$item) {
-            $seller = $em->getRepository(User::class)->find($item['seller']);
-            $product = $em->getRepository(Product::class)->find($key);
+            $seller = $userRepository->find($item['seller']);
+            $product = $productRepository->find($key);
 
                 $cart[$item['seller']][$index] = [
                             "product" => $product,

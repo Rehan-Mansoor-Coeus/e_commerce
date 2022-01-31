@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\DBAL\Types\TextType;
 //use http\Env\Request;
@@ -80,9 +81,9 @@ class RegisterController extends AbstractController
      * @Route("/users", name="users")
      */
 
-    public function user(){
+    public function user(UserRepository $user){
         $em = $this->getDoctrine()->getManager();
-        $user = $em->getRepository(User::class)->findAll();
+        $user = $user->findAll();
 
         return $this->render('register/record.html.twig', [
             'user' => $user
@@ -92,19 +93,15 @@ class RegisterController extends AbstractController
     /**
      * @Route("/delete-user/{id}", name="delete-user")
      */
-    public function remove(int $id){
+    public function remove(int $id , UserRepository $user){
         $em = $this->getDoctrine()->getManager();
-        $user = $em->getRepository(User::class)->find($id);
+        $user = $user->find($id);
 
-//        dd($user);
         try{
             $em->remove($user);
             $em->flush();
         } catch (\Exception $ex) {
-
-            $exception_message = $ex->getPrevious()->getCode();
-            return $this->render('AppBundle:Errors:error.html.twig', array('error' => $exception_message));
-
+            return $this->render('bundles/TwigBundle/Exception/error403.html.twig');
         }
 
         $this->addFlash('success', 'User has been Deleted!');

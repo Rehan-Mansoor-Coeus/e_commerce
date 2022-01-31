@@ -59,20 +59,25 @@ class CreateUserCommand extends Command
 
     private function createUser($input)
     {
-        $user = new User();
-        $em = $this->entityManager;
-        $user->setUsername($input->getArgument('username'));
-        $user->setEmail(rand(100,500).'@gmail.com');
-        $user->setPhone(rand(100000000,999999999));
-        $user->setAddress(rand(100,999));
-        $user->setPassword(
-            password_hash($input->getArgument('password'), PASSWORD_DEFAULT)
-        );
-        $user->setCreated(new \DateTime(date('Y-m-d')));
-        $user->addRole($em->getRepository(Role::class)->findOneBy(['roleName'=>'ROLE_ADMIN']));
-        $em->persist($user);
-        $em->flush();
+        try{
+            $user = new User();
+            $em = $this->entityManager;
+            $user->setUsername($input->getArgument('username'));
+            $user->setEmail(rand(100,500).'@gmail.com');
+            $user->setPhone(rand(100000000,999999999));
+            $user->setAddress(rand(100,999));
+            $user->setPassword(
+                password_hash($input->getArgument('password'), PASSWORD_DEFAULT)
+            );
+            $user->setCreated(new \DateTime(date('Y-m-d')));
+            $user->addRole($em->getRepository(Role::class)->findOneBy(['roleName'=>'ROLE_ADMIN']));
+            $em->persist($user);
+            $em->flush();
 
-        return true;
+            return true;
+        } catch (\Exception $ex) {
+            return "Something went wrong";
+        }
+
     }
 }

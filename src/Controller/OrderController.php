@@ -5,6 +5,9 @@ namespace App\Controller;
 use App\Entity\Order;
 use App\Entity\OrderDetail;
 use App\Entity\Product;
+use App\Repository\OrderDetailRepository;
+use App\Repository\OrderRepository;
+use App\Repository\ProductRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,11 +25,11 @@ class OrderController extends AbstractController
      * @Route("/order/record", name="order-record")
      * @IsGranted("ROLE_ADMIN")
      */
-    public function index(PaginationBundle $page , PaginatorInterface $paginator , Request $request): Response
+    public function index(PaginationBundle $page , PaginatorInterface $paginator , Request $request , OrderRepository $order): Response
     {
         $array = ['pending','complete','Rejected'];
         $em = $this->getDoctrine()->getManager();
-        $result = $em->getRepository(Order::class)->findAll();
+        $result = $order->findAll();
 
         $pagination = $page->get($result,$paginator,$request);
 
@@ -38,11 +41,11 @@ class OrderController extends AbstractController
     /**
      * @Route("/order/record/user", name="order-record-user")
      */
-    public function indexUser(PaginationBundle $page , PaginatorInterface $paginator , Request $request): Response
+    public function indexUser(PaginationBundle $page , PaginatorInterface $paginator , Request $request , OrderRepository $order): Response
     {
         $array = ['pending','complete','Rejected'];
         $em = $this->getDoctrine()->getManager();
-        $result = $em->getRepository(Order::class)->findBy([
+        $result = $order->findBy([
             'seller'=>$this->getUser()
         ]);
 
@@ -56,13 +59,18 @@ class OrderController extends AbstractController
 
 
     /**
-     * @Route("/order/view/{id}", name="order-view")
+     * @Route("/order/view/{id?1}", name="order-view")
      */
     public function view(Order $order): Response
     {
-        return $this->render('order/view.html.twig', [
-            'order' => $order,
-        ]);
+       try{
+            return $this->render('order/view.html.twig', [
+                'order' => $order,
+            ]);
+        } catch (\Exception $ex) {
+            return $this->render('bundles/TwigBundle/Exception/error404.html.twig');
+        }
+
     }
     /**
      * @Route("/order/edit/{id}", name="order-edit")
@@ -78,7 +86,7 @@ class OrderController extends AbstractController
     /**
      * @Route("/order/update/{id}", name="order-update")
      */
-    public function update(Order $order , Request $request , MailService $mail , MailerInterface $mailer): Response
+    public function update(Order $order , Request $request , MailService $mail , MailerInterface $mailer , ProductRepository $productRepository): Response
     {
         $em = $this->getDoctrine()->getManager();
         $data = $request->request->all();
@@ -86,7 +94,7 @@ class OrderController extends AbstractController
 
         if($data['status'] == 2){
             foreach($order->getOrderDetail() as $item){
-                $product = $em->getRepository(Product::class)->find($item->getProduct()->getId());
+                $product = $productRepository->find($item->getProduct()->getId());
                 $product->setStock($product->getStock() + $item->getQuantiity());
                 $em->persist($product);
                 $em->flush();
@@ -112,10 +120,10 @@ class OrderController extends AbstractController
     /**
      * @Route("/order/delete/{id}", name="order-delete")
      */
-    public function remove(Order $order): Response
+    public function remove(Order $order , OrderDetailRepository $detailRepository): Response
     {
         $em = $this->getDoctrine()->getManager();
-        $detail = $em->getRepository(OrderDetail::class)->findBy([
+        $detail = $detailRepository->findBy([
             'orderr' => $order,
         ]);
         foreach ($detail as $item){

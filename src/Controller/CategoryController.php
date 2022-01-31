@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Category;
 use App\Form\CategoryType;
+use App\Repository\CategoryRepository;
 use Doctrine\DBAL\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -52,10 +53,9 @@ class CategoryController extends AbstractController
     /**
      * @Route("/category/record", name="category-record")
      */
-    public function record(): Response
+    public function record(CategoryRepository $categoryRepository): Response
     {
-        $em = $this->getDoctrine()->getManager();
-        $result = $em->getRepository(Category::class)->findAll();
+        $result = $categoryRepository->findAll();
         $header = "Categorys Records";
         return $this->render('Category/record.html.twig', [
             'category' => $result,
@@ -68,12 +68,11 @@ class CategoryController extends AbstractController
     /**
      * @Route("/category/delete/{id}", name="delete-Category")
      */
-    public function remove($id): RedirectResponse
+    public function remove(Category $category): RedirectResponse
     {
         $em = $this->getDoctrine()->getManager();
-        $Category = $em->getRepository(Category::class)->find($id);
 
-        $em->remove($Category);
+        $em->remove($category);
         $em->flush();
 
         $this->addFlash('success', 'Category has been Deleted!');

@@ -4,6 +4,9 @@ namespace App\Controller;
 use App\Entity\Category;
 use App\Entity\Order;
 use App\Entity\Product;
+use App\Repository\CategoryRepository;
+use App\Repository\OrderRepository;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\Query\AST\LikeExpression;
 use Knp\Bundle\MarkdownBundle\MarkdownParserInterface;
 use Psr\Log\LoggerInterface;
@@ -38,13 +41,13 @@ class IndexController extends AbstractController
     /**
      * @Route("/products/{id}", name="product-category")
      */
-    public function productCategory(Category $category): Response
+    public function productCategory(Category $category , ProductRepository $productRepository , CategoryRepository $categoryRepository): Response
     {
-        $em = $this->getDoctrine()->getManager();
-        $result = $em->getRepository(Product::class)->findBy([
+
+        $result = $productRepository->findBy([
             'category' => $category
         ]);
-        $category = $em->getRepository(Category::class)->findAll();
+        $category = $categoryRepository->findAll();
 
         return $this->render('index/home.html.twig', [
             'result' => $result,
@@ -55,18 +58,18 @@ class IndexController extends AbstractController
     /**
      * @Route("/home", name="home")
      */
-    public function home(Request $request): Response
+    public function home(Request $request , ProductRepository $productRepository , CategoryRepository $categoryRepository): Response
     {
         $q = $request->query->get('search');
         $em = $this->getDoctrine()->getManager();
 
         if($q){
-            $result = $em->getRepository(Product::class)->findAllWithSearch($q);
+            $result = $productRepository->findAllWithSearch($q);
         }else{
-            $result = $em->getRepository(Product::class)->findAll();
+            $result = $productRepository->findAll();
         }
 
-        $category = $em->getRepository(Category::class)->findAll();
+        $category = $categoryRepository->findAll();
 
         return $this->render('index/home.html.twig', [
             'result' => $result,
@@ -77,12 +80,12 @@ class IndexController extends AbstractController
     /**
      * @Route("/account", name="account")
      */
-    public function account(): Response
+    public function account(OrderRepository $orderRepository , CategoryRepository $categoryRepository): Response
     {
         $array = ['pending','complete','Rejected'];
         $em = $this->getDoctrine()->getManager();
-        $category = $em->getRepository(Category::class)->findAll();
-        $result = $em->getRepository(Order::class)->findBy([
+        $category = $categoryRepository->findAll();
+        $result = $orderRepository->findBy([
             'user'=>$this->getUser()
         ]);
 
