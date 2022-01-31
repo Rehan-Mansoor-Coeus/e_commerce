@@ -9,6 +9,14 @@
         <source>Symfony is great</source>
         <target>Symfony est génial</target>
       </trans-unit>
+      <trans-unit id="UL.5xum" resname="I am a bad boy">
+        <source>I am a bad boy</source>
+        <target>__I am a bad boy</target>
+      </trans-unit>
+      <trans-unit id="ScJmuqq" resname="Search">
+        <source>Search</source>
+        <target>cuceeuu</target>
+      </trans-unit>
       <trans-unit id="GF_NsyJ" resname="Hello">
         <source>Hello</source>
         <target>Bonjour</target>

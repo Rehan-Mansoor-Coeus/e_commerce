@@ -1,3 +1,7 @@
 'Symfony is great': 'Symfony est génial'
-Hello: Bonjour
 'I am a bad boy': '__I am a bad boy'
+'Search' : 'chercher'
+'My Orders' : 'Mes commandes'
+'Logout' : 'Se déconnecter'
+'Login' : 'Connexion'
+'Cart' : 'Chariot'
