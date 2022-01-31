@@ -4,8 +4,6 @@ namespace App\Command;
 
 use App\Entity\Role;
 use App\Entity\User;
-// 1. Import the ORM EntityManager Interface
-use App\Entity\UserRole;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -62,6 +60,7 @@ class CreateUserCommand extends Command
     private function createUser($input)
     {
         $user = new User();
+        $em = $this->entityManager;
         $user->setUsername($input->getArgument('username'));
         $user->setEmail(rand(100,500).'@gmail.com');
         $user->setPhone(rand(100000000,999999999));
@@ -70,17 +69,9 @@ class CreateUserCommand extends Command
             password_hash($input->getArgument('password'), PASSWORD_DEFAULT)
         );
         $user->setCreated(new \DateTime(date('Y-m-d')));
-        $em = $this->entityManager;
+        $user->addRole($em->getRepository(Role::class)->findOneBy(['roleName'=>'ROLE_ADMIN']));
         $em->persist($user);
         $em->flush();
-
-        $userRole = new UserRole();
-        $userRole->setUser($user);
-        $userRole->setRole($em->getRepository(Role::class)->findOneBy(['roleName'=>'ROLE_ADMIN']));
-        $em->persist($userRole);
-        $em->flush();
-
-
 
         return true;
     }

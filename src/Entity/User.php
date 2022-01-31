@@ -55,7 +55,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $role;
 
     /**
-     * @ORM\OneToMany(targetEntity=Product::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Product::class, mappedBy="user" )
      */
     private $products;
 

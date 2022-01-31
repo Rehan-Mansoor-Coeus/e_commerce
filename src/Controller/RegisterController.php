@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\DBAL\Types\TextType;
 //use http\Env\Request;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -98,7 +99,6 @@ class RegisterController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'User has been Deleted!');
-
         return $this->redirectToRoute('users');
     }
 
