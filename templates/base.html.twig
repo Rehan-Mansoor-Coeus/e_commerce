@@ -112,26 +112,26 @@
 
             </ul>
             <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" name="search" type="search" placeholder="{% trans into 'fr_FR'%}Search{% endtrans %}" aria-label="Search" required>
-                <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">{% trans into 'fr_FR'%} Search {% endtrans %}</button>
+                <input class="form-control mr-sm-2" name="search" type="search" placeholder="{{ 'Search' | trans }}" aria-label="Search" required>
+                <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">{{ 'Search' | trans }}</button>
             </form>
             <div class="mr-3">
                 {% if is_granted('ROLE_USER') %}
                     {% if is_granted('ROLE_SELLER') %}
                        <a class="btn btn-warning" href="{{ path('index') }}">Admin Side</a>
                     {% else %}
-                       <a class="btn btn-success" href="{{ path('account') }}">{% trans into 'fr_FR'%}My Orders{% endtrans %}</a>
+                       <a class="btn btn-success" href="{{ path('account') }}">{{ 'My Orders' | trans }}</a>
                     {% endif %}
-                    <a class="btn btn-danger" href="{{ path('app_logout') }}">{% trans into 'fr_FR'%} Logout {% endtrans %}</a>
+                    <a class="btn btn-danger" href="{{ path('app_logout') }}">{{ 'Logout' | trans }}</a>
                 {% else %}
-                    <a  class="btn btn-success" href="/">{% trans into 'fr_FR'%} Login {% endtrans %}</a>
+                    <a  class="btn btn-success" href="/">{{ 'Login' | trans }}</a>
                 {% endif %}
             </div>
 
 
             <div class="dropdown" id="newrefresh">
                 <button type="button" class="btn btn-info" data-toggle="dropdown">
-                    <i class="fa fa-shopping-cart" aria-hidden="true"></i>{% trans into 'fr_FR'%} Cart {% endtrans %}<span class="badge badge-pill badge-danger">{{ app.session.get('cart') | length }}</span>
+                    <i class="fa fa-shopping-cart" aria-hidden="true"></i>{{ 'Cart' | trans }}<span class="badge badge-pill badge-danger">{{ app.session.get('cart') | length }}</span>
                 </button>
                 <div class="dropdown-menu">
                     {% set total = 0 %}
