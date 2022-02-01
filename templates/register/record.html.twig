@@ -1,6 +1,6 @@
 {% extends '/layout/base.html.twig' %}
 
-{% block title %}Create Tweet!{% endblock %}
+{% block title %}Create User!{% endblock %}
 
 {% block body %}
      {% for message in app.flashes('success') %}
@@ -8,10 +8,16 @@
                {{ message }}
           </div>
      {% endfor %}
+     {% for message in app.flashes('error') %}
+     <div class="alert alert-danger">
+          {{ message }}
+     </div>
+     {% endfor %}
      <div class="card">
           <div class="card-header">
                <header>Auther Records</header>
-               <a class="btn btn-warning float-right" href="/user/create">Create</a>
+               <a class="btn btn-warning float-right" href="{{ path('user-create') }}">Create</a>
+
           </div>
           <div class="card-body">
                <table class="table table-bordered table-striped">
@@ -30,7 +36,7 @@
 
                               <td>
 {#                                   <a href="/edit-user/{{ data.id }}" class="btn btn-primary">Edit</a>#}
-                                   <a href="/delete-user/{{ data.id }}" class="btn btn-danger">Del</a>
+                                   <a href="{{ path('delete-user' , {id:data.id}) }}" class="btn btn-danger">Del</a>
                               </td>
                          </tr>
                     {% endfor %}

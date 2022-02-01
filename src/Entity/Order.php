@@ -31,7 +31,7 @@ class Order
     /**
      * @ORM\OneToMany(targetEntity=OrderDetail::class, mappedBy="orderr")
      */
-    private $order_detail_id;
+    private $order_detail;
 
     /**
      * @ORM\Column(type="integer")
@@ -45,33 +45,33 @@ class Order
 
     public function __construct()
     {
-        $this->order_detail_id = new ArrayCollection();
+        $this->order_detail = new ArrayCollection();
     }
 
     /**
      * @return Collection|OrderDetail[]
      */
-    public function getOrderDetailId(): Collection
+    public function getOrderDetail(): Collection
     {
-        return $this->order_detail_id;
+        return $this->order_detail;
     }
 
-    public function addOrderDetailId(OrderDetail $orderDetailId): self
+    public function addOrderDetail(OrderDetail $orderDetail): self
     {
-        if (!$this->order_detail_id->contains($orderDetailId)) {
-            $this->order_detail_id[] = $orderDetailId;
-            $orderDetailId->setOrderr($this);
+        if (!$this->order_detail->contains($orderDetail)) {
+            $this->order_detail[] = $orderDetail;
+            $orderDetail->setOrderr($this);
         }
 
         return $this;
     }
 
-    public function removeOrderDetailId(OrderDetail $orderDetailId): self
+    public function removeOrderDetail(OrderDetail $orderDetail): self
     {
-        if ($this->order_detail_id->removeElement($orderDetailId)) {
+        if ($this->order_detail->removeElement($orderDetail)) {
             // set the owning side to null (unless already changed)
-            if ($orderDetailId->getOrderr() === $this) {
-                $orderDetailId->setOrderr(null);
+            if ($orderDetail->getOrderr() === $this) {
+                $orderDetail->setOrderr(null);
             }
         }
 
@@ -116,6 +116,15 @@ class Order
      */
     protected $updated;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders")
+     */
+    private $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders")
+     */
+    private $seller;
 
     /**
      * Set created
@@ -160,4 +169,30 @@ class Order
     {
         return $this->updated;
     }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getSeller(): ?User
+    {
+        return $this->seller;
+    }
+
+    public function setSeller(?User $seller): self
+    {
+        $this->seller = $seller;
+
+        return $this;
+    }
+
+
 }

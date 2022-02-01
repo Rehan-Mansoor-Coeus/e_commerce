@@ -1,6 +1,6 @@
 {% extends '/layout/base.html.twig' %}
 
-{% block title %}Create Tweet!{% endblock %}
+{% block title %}Create User!{% endblock %}
 
 {% block body %}
      {% for message in app.flashes('success') %}
@@ -11,7 +11,7 @@
      <div class="card">
           <div class="card-header">
                <header> Create new Author </header>
-               <a class="btn btn-primary float-right" href="/users">Records</a>
+               <a class="btn btn-primary float-right" href="{{ path('users') }}">Records</a>
           </div>
           <div class="card-body">
                {{ form(form) }}

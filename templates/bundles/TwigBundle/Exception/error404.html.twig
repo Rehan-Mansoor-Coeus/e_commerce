@@ -1,7 +1,14 @@
-{% extends '/layout/base.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block title %}Tweet Record!{% endblock %}
+{% block title %}Error message{% endblock %}
 
-    {% block body %}
-        <h1>403 error 123456</h1>
-    {% endblock %}
+
+{% block body %}
+    <h1>Page not found</h1>
+
+    <p>
+        The requested page couldn't be located. Checkout for any URL
+        misspelling or <a href="{{ path('home') }}">return to the homepage</a>.
+        <button type="button" class="btn btn-default" onclick="javascript:history.go(-1)">Back</button>
+    </p>
+{% endblock %}

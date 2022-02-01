@@ -3,8 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
+use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\DBAL\Types\TextType;
 //use http\Env\Request;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -27,6 +32,9 @@ class RegisterController extends AbstractController
     {
         $form = $this->createFormBuilder()
             ->add('username')
+            ->add('email',EmailType::class)
+            ->add('phone',NumberType::class)
+            ->add('address' ,  TextareaType::class)
             ->add('password' ,RepeatedType::class , [
                 'type' => PasswordType::class,
                 'required' => true ,
@@ -50,6 +58,9 @@ class RegisterController extends AbstractController
 
             $user = new User();
             $user->setUsername($data['username']);
+            $user->setEmail($data['email']);
+            $user->setPhone($data['phone']);
+            $user->setAddress($data['address']);
             $user->setPassword(
                 $passEncode->encodePassword($user , $data['password'])
             );
@@ -70,10 +81,8 @@ class RegisterController extends AbstractController
      * @Route("/users", name="users")
      */
 
-    public function user(){
-        $em = $this->getDoctrine()->getManager();
-        $user = $em->getRepository(User::class)->findAll();
-
+    public function user(UserRepository $user){
+        $user = $user->findAll();
         return $this->render('register/record.html.twig', [
             'user' => $user
         ]);
@@ -82,17 +91,16 @@ class RegisterController extends AbstractController
     /**
      * @Route("/delete-user/{id}", name="delete-user")
      */
-    public function remove(int $id){
-        $em = $this->getDoctrine()->getManager();
-        $user = $em->getRepository(User::class)->find($id);
-        $em->remove($user);
-        $em->flush();
-
-        $this->addFlash('success', 'User has been Deleted!');
-
+    public function remove(User $user , UserRepository $userRepository){
+        // refactor 2
+        try{
+            $userRepository->removeUser($user);
+            $this->addFlash('success', 'User has been Deleted!');
+        } catch (\Exception $ex) {
+            $this->addFlash('error', $ex->getMessage());
+        }
         return $this->redirectToRoute('users');
     }
-
 
     /**
      * @Route("/user/create", name="user-create")
@@ -101,6 +109,9 @@ class RegisterController extends AbstractController
     {
         $form = $this->createFormBuilder()
             ->add('username')
+            ->add('email',EmailType::class)
+            ->add('phone',NumberType::class)
+            ->add('address' ,  TextareaType::class)
             ->add('password' ,RepeatedType::class , [
                 'type' => PasswordType::class,
                 'required' => true ,
@@ -124,6 +135,9 @@ class RegisterController extends AbstractController
 
             $user = new User();
             $user->setUsername($data['username']);
+            $user->setEmail($data['email']);
+            $user->setPhone($data['phone']);
+            $user->setAddress($data['address']);
             $user->setPassword(
                 $passEncode->encodePassword($user , $data['password'])
             );

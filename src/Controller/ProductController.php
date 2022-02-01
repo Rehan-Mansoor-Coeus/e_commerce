@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Form\ProductType;
+use App\Repository\ProductRepository;
 use Doctrine\DBAL\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -62,10 +63,9 @@ class ProductController extends AbstractController
     /**
      * @Route("/product/record", name="product-record")
      */
-    public function record(): Response
+    public function record(ProductRepository $product): Response
     {
-        $em = $this->getDoctrine()->getManager();
-        $result = $em->getRepository(product::class)->findAll();
+        $result = $product->findAll();
         $header = "products Records";
         return $this->render('product/record.html.twig', [
             'product' => $result,
@@ -73,16 +73,12 @@ class ProductController extends AbstractController
         ]);
     }
 
-
-
     /**
      * @Route("/product/record/user", name="product-record-user")
      */
-    public function recordUser(): Response
+    public function recordUser(ProductRepository $product): Response
     {
-
-        $em = $this->getDoctrine()->getManager();
-        $result = $em->getRepository(product::class)->findBy([
+        $result = $product->findBy([
             'user' => $this->getUser()
         ]);
         $header = "My products Records";
@@ -96,34 +92,45 @@ class ProductController extends AbstractController
     /**
      * @Route("/delete-product/{id}", name="delete-product")
      */
-    public function remove(product $product){
+    public function remove(product $product = null)
+    {
+        if($product == null){
+            return $this->notFound();
+        }elseif(!$this->isGranted('DELETE', $product)) {
+            return $this->notPermission();
+        }
+        else
+        {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($product);
+            $em->flush();
 
-        $this->denyAccessUnlessGranted('DELETE', $product);
+            $this->addFlash('success', 'product has been Deleted!');
 
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($product);
-        $em->flush();
-
-        $this->addFlash('success', 'product has been Deleted!');
-
-        return $this->redirectToRoute('product-record');
+            return $this->redirectToRoute('product-record');
+        }
     }
 
 
     /**
      * @Route("/product/edit/{id}", name="product-edit")
      */
-    public function edit(product $product ,Request $request , $id): Response
+    public function edit(Request $request,product $product = null): Response
     {
-        $this->denyAccessUnlessGranted('EDIT', $product);
-
+       if($product == null){
+           return $this->notFound();
+       }elseif(!$this->isGranted('EDIT', $product)) {
+           return $this->notPermission();
+       }
+       else
+       {
 
         $form = $this->createForm(ProductType::class , $product);
 
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
 
-            $em = $this->getDoctrine()->getManager();
+
             $data = $form->getData();
 
             if($request->files->get('product')['image']){
@@ -137,7 +144,7 @@ class ProductController extends AbstractController
             }
 
             $product->setUser($this->getUser());
-
+            $em = $this->getDoctrine()->getManager();
             $em->flush();
 
             $this->addFlash('success', 'product has been Updated!');
@@ -148,6 +155,8 @@ class ProductController extends AbstractController
         return $this->render('product/edit.html.twig', [
             'form' => $form->createView()
         ]);
+    }
+
     }
 
 
