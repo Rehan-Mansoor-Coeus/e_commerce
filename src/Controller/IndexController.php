@@ -59,8 +59,8 @@ class IndexController extends AbstractController
      */
     public function home(Request $request , ProductRepository $productRepository , CategoryRepository $categoryRepository): Response
     {
-        $q = $request->query->get('search');
 
+        $q = $request->query->get('search');
         if($q){
             $result = $productRepository->findAllWithSearch($q);
         }else{
