@@ -82,9 +82,7 @@ class RegisterController extends AbstractController
      */
 
     public function user(UserRepository $user){
-        $em = $this->getDoctrine()->getManager();
         $user = $user->findAll();
-
         return $this->render('register/record.html.twig', [
             'user' => $user
         ]);
@@ -93,21 +91,16 @@ class RegisterController extends AbstractController
     /**
      * @Route("/delete-user/{id}", name="delete-user")
      */
-    public function remove(int $id , UserRepository $user){
-        $em = $this->getDoctrine()->getManager();
-        $user = $user->find($id);
-
+    public function remove(User $user , UserRepository $userRepository){
+        // refactor 2
         try{
-            $em->remove($user);
-            $em->flush();
+            $userRepository->removeUser($user);
+            $this->addFlash('success', 'User has been Deleted!');
         } catch (\Exception $ex) {
-            return $this->render('bundles/TwigBundle/Exception/error403.html.twig');
+            $this->addFlash('error', $ex->getMessage());
         }
-
-        $this->addFlash('success', 'User has been Deleted!');
         return $this->redirectToRoute('users');
     }
-
 
     /**
      * @Route("/user/create", name="user-create")

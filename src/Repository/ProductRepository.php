@@ -20,6 +20,7 @@ class ProductRepository extends ServiceEntityRepository
     }
 
      /**
+      * finding products
       * @param null|string $term
       * @return Product[] Returns an array of Product objects
       */
@@ -39,15 +40,9 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult()
             ;
 
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
     }
+
+
 
 
     /*

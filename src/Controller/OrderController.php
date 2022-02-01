@@ -28,7 +28,6 @@ class OrderController extends AbstractController
     public function index(PaginationBundle $page , PaginatorInterface $paginator , Request $request , OrderRepository $order): Response
     {
         $array = ['pending','complete','Rejected'];
-        $em = $this->getDoctrine()->getManager();
         $result = $order->findAll();
 
         $pagination = $page->get($result,$paginator,$request);
@@ -44,7 +43,6 @@ class OrderController extends AbstractController
     public function indexUser(PaginationBundle $page , PaginatorInterface $paginator , Request $request , OrderRepository $order): Response
     {
         $array = ['pending','complete','Rejected'];
-        $em = $this->getDoctrine()->getManager();
         $result = $order->findBy([
             'seller'=>$this->getUser()
         ]);
@@ -59,29 +57,34 @@ class OrderController extends AbstractController
 
 
     /**
-     * @Route("/order/view/{id?1}", name="order-view")
+     * @Route("/order/view/{id}", name="order-view")
      */
-    public function view(Order $order): Response
+    public function view(Order $order = null): Response
     {
        try{
             return $this->render('order/view.html.twig', [
                 'order' => $order,
             ]);
         } catch (\Exception $ex) {
-            return $this->render('bundles/TwigBundle/Exception/error404.html.twig');
+            return $this->notFound();
         }
 
     }
     /**
      * @Route("/order/edit/{id}", name="order-edit")
      */
-    public function edit(Order $order , Request $request): Response
+    public function edit(Order $order = null): Response
     {
-        $array = ['pending','complete','Rejected'];
-        return $this->render('order/edit.html.twig', [
-            'result' => $order,
-            'array' => $array
-        ]);
+        try{
+            $array = ['pending','complete','Rejected'];
+            return $this->render('order/edit.html.twig', [
+                'result' => $order,
+                'array' => $array
+            ]);
+        } catch (\Exception $ex) {
+            return $this->notFound();
+        }
+
     }
     /**
      * @Route("/order/update/{id}", name="order-update")
@@ -105,7 +108,7 @@ class OrderController extends AbstractController
             $em->persist($order);
             $em->flush();
 
-
+           // mail code
             $to = $order->getUser()->getEmail();
             $customer = $order->getUser()->getUsername();
             $order_no = $order->getId();
@@ -120,20 +123,20 @@ class OrderController extends AbstractController
     /**
      * @Route("/order/delete/{id}", name="order-delete")
      */
-    public function remove(Order $order , OrderDetailRepository $detailRepository): Response
-    {
-        $em = $this->getDoctrine()->getManager();
-        $detail = $detailRepository->findBy([
-            'orderr' => $order,
-        ]);
-        foreach ($detail as $item){
-        $em->remove($item);
-        }
-        $em->remove($order);
-        $em->flush();
-
-        $this->addFlash('danger', 'Order has been Deleted!');
-
-        return $this->redirectToRoute('order-record');
-    }
+//    public function remove(Order $order , OrderDetailRepository $detailRepository): Response
+//    {
+//        $em = $this->getDoctrine()->getManager();
+//        $detail = $detailRepository->findBy([
+//            'orderr' => $order,
+//        ]);
+//        foreach ($detail as $item){
+//        $em->remove($item);
+//        }
+//        $em->remove($order);
+//        $em->flush();
+//
+//        $this->addFlash('danger', 'Order has been Deleted!');
+//
+//        return $this->redirectToRoute('order-record');
+//    }
 }

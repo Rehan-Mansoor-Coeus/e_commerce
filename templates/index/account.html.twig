@@ -19,7 +19,7 @@
                                 <th>Total</th>
                                 <th>Status</th>
                                 <th>Date</th>
-                                <th>Action</th>
+{#                                <th>Action</th>#}
                             </tr>
                             </thead>
                             <tbody>
@@ -30,15 +30,17 @@
                                     <td>{{ data.total }}</td>
                                     <td>{{ array[data.status] }}</td>
                                     <td>{{ data.created }}</td>
-                                    <td>
-                                        <a href="/order/view/{{ data.id }}" class="btn btn-warning">View</a>
-                                    </td>
+{#                                    <td>#}
+{#                                        <a href="/order/view/{{ data.id }}" class="btn btn-warning">View</a>#}
+{#                                    </td>#}
                                 </tr
                             {% endfor %}
                             </tbody>
                         </table>
                     </div>
-
+                    <div class="navigation float-right">
+                        {{ knp_pagination_render(result) }}
+                    </div>
                 </div>
             </div>
         </div>

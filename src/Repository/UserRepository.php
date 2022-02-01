@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -34,6 +35,22 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
         $this->_em->persist($user);
         $this->_em->flush();
+    }
+
+    /**
+     * remove user
+     * @param User $user
+     * @return bool
+     */
+    public function removeUser(User $user): bool
+    {
+        try{
+            $this->_em->remove($user);
+            $this->_em->flush();
+            return true;
+        }catch (\Exception $ex){
+            throw new Exception('You cannot delete this User', 201);
+        }
     }
 
     // /**

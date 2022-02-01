@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controller;
+use App\Bundle\CustomBundle\PaginationBundle;
 use App\Entity\Category;
 use App\Entity\Order;
 use App\Entity\Product;
@@ -9,6 +10,7 @@ use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Query\AST\LikeExpression;
 use Knp\Bundle\MarkdownBundle\MarkdownParserInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,23 +30,19 @@ class IndexController extends AbstractController
 
     /**
      * @Route("/admin", name="index")
-     *
-     *
      */
-    public function index(TranslatorInterface $translator): Response
+    public function index(): Response
     {
-        $translated = $translator->trans('Search');
-
         return $this->render('index/index.html.twig', [
             'controller_name' => 'IndexController',
         ]);
     }
+
     /**
      * @Route("/products/{id}", name="product-category")
      */
     public function productCategory(Category $category , ProductRepository $productRepository , CategoryRepository $categoryRepository): Response
     {
-
         $result = $productRepository->findBy([
             'category' => $category
         ]);
@@ -62,7 +60,6 @@ class IndexController extends AbstractController
     public function home(Request $request , ProductRepository $productRepository , CategoryRepository $categoryRepository): Response
     {
         $q = $request->query->get('search');
-        $em = $this->getDoctrine()->getManager();
 
         if($q){
             $result = $productRepository->findAllWithSearch($q);
@@ -81,14 +78,14 @@ class IndexController extends AbstractController
     /**
      * @Route("/account", name="account")
      */
-    public function account(OrderRepository $orderRepository , CategoryRepository $categoryRepository): Response
+    public function account(PaginationBundle $page , PaginatorInterface $paginator ,OrderRepository $orderRepository , CategoryRepository $categoryRepository ,  Request $request): Response
     {
         $array = ['pending','complete','Rejected'];
-        $em = $this->getDoctrine()->getManager();
         $category = $categoryRepository->findAll();
         $result = $orderRepository->findBy([
             'user'=>$this->getUser()
         ]);
+        $result = $page->get($result,$paginator,$request);
 
         return $this->render('index/account.html.twig', [
             'result' => $result,
