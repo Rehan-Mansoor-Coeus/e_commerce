@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
+use App\Service\ProductService;
 use Doctrine\DBAL\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,40 +20,22 @@ class ProductController extends AbstractController
     /**
      * @Route("/product", name="product")
      */
-    public function index(Request $request): Response
+    public function index(Request $request , ProductRepository $productRepository): Response
     {
         $product = new Product();
         $form = $this->createForm(ProductType::class , $product , [
             'action' => $this->generateUrl('product')
         ]);
 
-
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
-            $data = $form->getData();
 
-
-            if($request->files->get('product')['image']) {
-                $file = $request->files->get('product')['image'];
-                $upload_directory = $this->getParameter('upload_directory');
-                $file_name = rand(100000, 999999) . '.' . $file->guessExtension();
-
-                $file->move($upload_directory, $file_name);
-                $product->setImage($file_name);
-            }
-
-            $product->setUser($this->getUser());
-            $product->setCreated(new \DateTime(date('Y-m-d')));
-
-
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($product);
-            $em->flush();
-
+            $path = $this->getParameter('upload_directory');
+            $user = $this->getUser();
+            $productRepository->createProduct($request,$product,$path,$user);
 
             $this->addFlash('success', 'Product has been Uploaded!');
-
-            return $this->redirect($this->generateUrl('product'));
+             return $this->redirect($this->generateUrl('product'));
         }
 
         return $this->render('product/index.html.twig', [
@@ -92,60 +75,44 @@ class ProductController extends AbstractController
     /**
      * @Route("/delete-product/{id}", name="delete-product")
      */
-    public function remove(product $product = null)
+    public function remove(ProductService $productService,ProductRepository $productRepository,  product $product = null)
     {
-        if($product == null){
-            return $this->notFound();
-        }elseif(!$this->isGranted('DELETE', $product)) {
+        if(!$this->isGranted('DELETE', $product)) {
             return $this->notPermission();
         }
-        else
-        {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($product);
-            $em->flush();
-
+         try{
+            $productService->checkParam($product);
+            $productRepository->removeProduct($product);
             $this->addFlash('success', 'product has been Deleted!');
-
-            return $this->redirectToRoute('product-record');
+        } catch (\Exception $ex) {
+            $this->addFlash('error', $ex->getMessage());
         }
+        return $this->redirectToRoute('product-record-user');
     }
 
 
     /**
      * @Route("/product/edit/{id}", name="product-edit")
+     *
      */
-    public function edit(Request $request,product $product = null): Response
+    public function edit(Request $request, ProductRepository $productRepository,ProductService $productService , product $product = null): Response
     {
-       if($product == null){
-           return $this->notFound();
-       }elseif(!$this->isGranted('EDIT', $product)) {
-           return $this->notPermission();
-       }
-       else
-       {
+        if(!$this->isGranted('EDIT', $product)) {
+            return $this->notPermission();
+        }
+        try{
+            $productService->checkParam($product);
+        } catch (\Exception $ex) {
+            $this->addFlash('error', $ex->getMessage());
+        }
 
         $form = $this->createForm(ProductType::class , $product);
-
-        $form->handleRequest($request);
+       $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
 
-
-            $data = $form->getData();
-
-            if($request->files->get('product')['image']){
-                $file = $request->files->get('product')['image'];
-                $upload_directory = $this->getParameter('upload_directory');
-                $file_name = rand(100000,999999).'.'.$file->guessExtension();
-
-                $file->move($upload_directory,$file_name);
-
-                $product->setImage($file_name);
-            }
-
-            $product->setUser($this->getUser());
-            $em = $this->getDoctrine()->getManager();
-            $em->flush();
+            $path = $this->getParameter('upload_directory');
+            $user = $this->getUser();
+            $productRepository->createProduct($request,$product,$path,$user);
 
             $this->addFlash('success', 'product has been Updated!');
             return $this->redirect($this->generateUrl('product-record-user'));
@@ -155,7 +122,6 @@ class ProductController extends AbstractController
         return $this->render('product/edit.html.twig', [
             'form' => $form->createView()
         ]);
-    }
 
     }
 

@@ -14,7 +14,6 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-//use App\Security\Voter\CategoryVoter;
 
 class CategoryController extends AbstractController
 {
@@ -36,10 +35,7 @@ class CategoryController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($Category);
             $em->flush();
-
-
             $this->addFlash('success', 'Category has been Uploaded!');
-
             return $this->redirect($this->generateUrl('category'));
         }
 
@@ -81,7 +77,7 @@ class CategoryController extends AbstractController
     /**
      * @Route("/category/edit/{id}", name="category-edit")
      */
-    public function edit(Category $Category ,Request $request , $id): Response
+    public function edit(Category $Category ,Request $request): Response
     {
 
         $form = $this->createForm(CategoryType::class , $Category);
@@ -91,8 +87,6 @@ class CategoryController extends AbstractController
 
             $em = $this->getDoctrine()->getManager();
             $data = $form->getData();
-
-
             $em->flush();
 
             $this->addFlash('success', 'Category has been Updated!');

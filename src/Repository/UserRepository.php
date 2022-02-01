@@ -18,6 +18,9 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
+    /**
+     *
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
@@ -52,6 +55,34 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             throw new Exception('You cannot delete this User', 201);
         }
     }
+
+    /**
+     * create user code
+     *@return bool
+     */
+    public function createUser($data , $passEncode):bool
+    {
+        try{
+        $user = new User();
+        $user->setUsername($data->getUsername());
+        $user->setEmail($data->getEmail());
+        $user->setPhone($data->getPhone());
+        $user->setAddress($data->getAddress());
+        $user->setLocale($data->getLocale());
+        $user->setPassword(
+            $passEncode->encodePassword($user , $data->getPassword())
+        );
+        $user->setCreated(new \DateTime(date('Y-m-d')));
+
+        $this->_em->persist($user);
+        $this->_em->flush();
+        return true;
+        }catch (\Exception $ex){
+            throw new Exception('You cannot Create this User', 201);
+        }
+    }
+
+
 
     // /**
     //  * @return User[] Returns an array of User objects

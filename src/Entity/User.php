@@ -228,7 +228,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $email;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string" , length=255)
      */
     private $phone;
 
@@ -366,9 +366,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setLocale(string $locale): self
     {
-        $this->locale = $locale;
-
+        if($locale){
+            $this->locale = $locale;
+        }else{
+            $this->locale = 'en';
+        }
         return $this;
+
     }
 
 }

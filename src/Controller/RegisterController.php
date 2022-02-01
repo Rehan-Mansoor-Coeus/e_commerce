@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\DBAL\Types\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -27,47 +29,22 @@ class RegisterController extends AbstractController
     /**
      * @Route("/register", name="register")
      */
-    public function register(Request $request , UserPasswordEncoderInterface $passEncode)
+    public function register(Request $request , UserPasswordEncoderInterface $passEncode , UserRepository $userRepository)
     {
-        $form = $this->createFormBuilder()
-            ->add('username')
-            ->add('email',EmailType::class)
-            ->add('phone',NumberType::class)
-            ->add('address' ,  TextareaType::class)
-            ->add('password' ,RepeatedType::class , [
-                'type' => PasswordType::class,
-                'required' => true ,
-                'first_options' => ['label' => 'Password'] ,
-                'second_options' => ['label' => 'Confirm Password'],
-                'constraints' => [new Assert\Length([
-                    'min' => 6,
-                    'max' => 8,
-                ])],
-            ])
-            ->add('Register' , SubmitType::class , [
-                'attr' => [
-                    'class' => 'btn btn-success float-right'
-                ]
-            ])
-            ->getForm();
+//        refactor 3
+        $user = new User();
+        $form = $this->createForm(UserType::class , $user , [
+            'action' => $this->generateUrl('register')
+        ]);
 
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $data = $form->getData();
-
-            $user = new User();
-            $user->setUsername($data['username']);
-            $user->setEmail($data['email']);
-            $user->setPhone($data['phone']);
-            $user->setAddress($data['address']);
-            $user->setPassword(
-                $passEncode->encodePassword($user , $data['password'])
-            );
-            $user->setCreated(new \DateTime(date('Y-m-d')));
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($user);
-            $em->flush();
-
+            try{
+            $userRepository->createUser($data,$passEncode);
+            } catch (\Exception $ex) {
+                $this->addFlash('error', $ex->getMessage());
+            }
             return $this->redirect($this->generateUrl('app_login'));
         }
 
@@ -104,50 +81,25 @@ class RegisterController extends AbstractController
     /**
      * @Route("/user/create", name="user-create")
      */
-    public function create(Request $request , UserPasswordEncoderInterface $passEncode)
+    public function create(Request $request , UserPasswordEncoderInterface $passEncode , UserRepository $userRepository)
     {
-        $form = $this->createFormBuilder()
-            ->add('username')
-            ->add('email',EmailType::class)
-            ->add('phone',NumberType::class)
-            ->add('address' ,  TextareaType::class)
-            ->add('password' ,RepeatedType::class , [
-                'type' => PasswordType::class,
-                'required' => true ,
-                'first_options' => ['label' => 'Password'] ,
-                'second_options' => ['label' => 'Confirm Password'],
-                'constraints' => [new Assert\Length([
-                    'min' => 6,
-                    'max' => 8,
-                    ])]
-            ])
-            ->add('Register' , SubmitType::class , [
-                'attr' => [
-                    'class' => 'btn btn-success float-right'
-                ]
-            ])
-            ->getForm();
+        $user = new User();
+        $form = $this->createForm(UserType::class , $user , [
+            'action' => $this->generateUrl('user-create')
+        ]);
 
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $data = $form->getData();
+            try{
+                $userRepository->createUser($data,$passEncode);
+                $this->addFlash('success', 'New Author has been Created!');
+            } catch (\Exception $ex) {
+                $this->addFlash('error', $ex->getMessage());
+            }
 
-            $user = new User();
-            $user->setUsername($data['username']);
-            $user->setEmail($data['email']);
-            $user->setPhone($data['phone']);
-            $user->setAddress($data['address']);
-            $user->setPassword(
-                $passEncode->encodePassword($user , $data['password'])
-            );
-            $user->setCreated(new \DateTime(date('Y-m-d')));
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($user);
-            $em->flush();
-            $this->addFlash('success', 'New Author has been Created!');
             return $this->redirect($this->generateUrl('users'));
         }
-
 
         return $this->render('register/form.html.twig', [
             'form' => $form->createView()
