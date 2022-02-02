@@ -1,6 +1,6 @@
 {% extends '/layout/base.html.twig' %}
 
-{% block title %}Create User!{% endblock %}
+{% block title %}User Record!{% endblock %}
 
 {% block body %}
      {% for message in app.flashes('success') %}
@@ -15,7 +15,7 @@
      {% endfor %}
      <div class="card">
           <div class="card-header">
-               <header>Auther Records</header>
+               <header>User Records</header>
                <a class="btn btn-warning float-right" href="{{ path('user-create') }}">Create</a>
 
           </div>

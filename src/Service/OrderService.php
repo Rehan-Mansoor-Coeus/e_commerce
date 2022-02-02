@@ -1,26 +1,34 @@
 <?php
 namespace App\Service;
 
+use App\Repository\ProductRepository;
+use App\Repository\UserRepository;
 use Exception;
 
-
+/**
+ *@property ProductRepository $productRepository
+ *@property UserRepository $userRepository
+ *
+ */
 class OrderService
 {
+    public function __construct(ProductRepository $productRepository , UserRepository $userRepository)
+    {
+        $this->productRepository = $productRepository;
+        $this->userRepository = $userRepository;
 
-    /**
-     * check parameter is invalid or null
-     * @param $category
-     * @return bool
-     * @throws Exception
-     */
-    public function manageOrders($cart){
-        $seller = [];
+    }
+
+
+    public function manageOrders($carts,$user){
+
         $total = [];
+        $cart = [];
         $index = 0;
 
-        foreach ($session->get('cart') as $key=>$item) {
-            $seller = $userRepository->find($item['seller']);
-            $product = $productRepository->find($key);
+        foreach ($carts as $key=>$item) {
+            $seller = $this->userRepository->find($item['seller']);
+            $product = $this->productRepository->find($key);
 
             $cart[$item['seller']][$index] = [
                 "product" => $product,
@@ -29,9 +37,11 @@ class OrderService
                 "seller" => $seller,
             ];
             @$total[$item['seller']] += $item['price'] * $item['quantity'];
-            $em->flush();
             $index++;
         }
+
+
+        return [$cart,$total];
     }
 
 }

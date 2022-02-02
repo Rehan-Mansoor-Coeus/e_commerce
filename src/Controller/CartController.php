@@ -51,29 +51,15 @@ class CartController extends AbstractController
      * @Route("/checkout/complete", name="checkout-commplete")
      * @IsGranted("ROLE_USER")
      */
-    public function create(MailerInterface $mailer, MailService $mail , UserRepository $userRepository , ProductRepository $productRepository , OrderRepository $orderRepository , OrderDetailRepository $detailRepository)
+    public function create(MailerInterface $mailer, MailService $mail , UserRepository $userRepository , ProductRepository $productRepository , OrderRepository $orderRepository , OrderDetailRepository $detailRepository , OrderService $orderService)
     {
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         $session = new Session();
 
-        $total = [];
-        $index = 0;
-
-        foreach ($session->get('cart') as $key=>$item) {
-            $seller = $userRepository->find($item['seller']);
-            $product = $productRepository->find($key);
-
-                $cart[$item['seller']][$index] = [
-                            "product" => $product,
-                            "quantity" => $item['quantity'],
-                            "buyyer" => $user,
-                            "seller" => $seller,
-                ];
-                @$total[$item['seller']] += $item['price'] * $item['quantity'];
-                $em->flush();
-                $index++;
-        }
+        $result = $orderService->manageOrders($session->get('cart') , $user);
+        $cart = $result[0];
+        $total = $result[1];
 
         $index2 = 0;
         foreach($cart as $ki=>$items){
@@ -83,7 +69,6 @@ class CartController extends AbstractController
             $order = $orderRepository->createOrder($seller,$user,$total_amount);
 
             foreach ($items as $key=>$item){
-
                 $detailRepository->createOrderDetail($item,$order);
 
                 $product = $item['product'];

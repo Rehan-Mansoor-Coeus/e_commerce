@@ -111,7 +111,7 @@ class ProductController extends AbstractController
         if($form->isSubmitted() && $form->isValid()){
 
             $path = $this->getParameter('upload_directory');
-            $user = $this->getUser();
+            $user = $product->getUser();
             $productRepository->createProduct($request,$product,$path,$user);
 
             $this->addFlash('success', 'product has been Updated!');
