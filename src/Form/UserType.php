@@ -46,6 +46,13 @@ class UserType extends AbstractType
                     'max' => 8,
                 ])],
             ])
+            ->add('userType' ,  ChoiceType::class , [
+                'mapped' => false,
+                'choices'  => [
+                    'Buyer' => '0',
+                    'Seller' => '1',
+                ],
+            ])
             ->add('Register' , SubmitType::class , [
                 'attr' => [
                     'class' => 'btn btn-success float-right'

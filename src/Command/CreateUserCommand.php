@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\Role;
 use App\Entity\User;
+use App\Repository\RoleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,12 +20,14 @@ class CreateUserCommand extends Command
     protected static $defaultDescription = 'Creates a new user.';
 
     private $entityManager;
+    private $roleRepository;
 
-    public function __construct(bool $requirePassword = false , bool $requireUsername = false ,EntityManagerInterface $entityManager )
+    public function __construct(bool $requirePassword = false , bool $requireUsername = false ,EntityManagerInterface $entityManager ,RoleRepository $roleRepository)
     {
         $this->entityManager = $entityManager;
         $this->requireUsername = $requireUsername;
         $this->requirePassword = $requirePassword;
+        $this->roleRepository = $roleRepository;
 
         parent::__construct();
     }
@@ -71,7 +74,7 @@ class CreateUserCommand extends Command
                 password_hash($input->getArgument('password'), PASSWORD_DEFAULT)
             );
             $user->setCreated(new \DateTime(date('Y-m-d')));
-            $user->addRole($em->getRepository(Role::class)->findOneBy(['roleName'=>'ROLE_ADMIN']));
+            $user->addRole($this->roleRepository->findOneBy(['roleName'=>'ROLE_ADMIN']));
             $em->persist($user);
             $em->flush();
 

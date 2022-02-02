@@ -59,6 +59,7 @@ class RegisterController extends AbstractController
 
     public function user(UserRepository $user){
         $user = $user->findAll();
+
         return $this->render('register/record.html.twig', [
             'user' => $user
         ]);
@@ -91,9 +92,11 @@ class RegisterController extends AbstractController
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $data = $form->getData();
+            $userType = $form['userType']->getData();
+
             try{
-                $userRepository->createUser($data,$passEncode);
-                $this->addFlash('success', 'New Author has been Created!');
+                $userRepository->createUser($data,$passEncode,$userType);
+                $this->addFlash('success', 'New User has been Created!');
             } catch (\Exception $ex) {
                 $this->addFlash('error', $ex->getMessage());
             }
@@ -119,7 +122,7 @@ class RegisterController extends AbstractController
 
             try{
                 $userRepository->updateUser($data,$passEncode , $user);
-                $this->addFlash('success', 'Author has been Updated!');
+                $this->addFlash('success', 'User has been Updated!');
             } catch (\Exception $ex) {
                 $this->addFlash('error', $ex->getMessage());
             }
@@ -127,7 +130,7 @@ class RegisterController extends AbstractController
             return $this->redirect($this->generateUrl('users'));
         }
 
-        return $this->render('register/form.html.twig', [
+        return $this->render('register/edit.html.twig', [
             'form' => $form->createView()
         ]);
     }

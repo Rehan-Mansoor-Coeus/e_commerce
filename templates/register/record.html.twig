@@ -25,6 +25,8 @@
                     <tr class="bg-danger">
                          <th>ID</th>
                          <th>User</th>
+                         <th>Eamil</th>
+                         <th>Phone</th>
                          <th>Action</th>
                     </tr>
                     </thead>
@@ -33,6 +35,8 @@
                          <tr>
                               <td>{{ data.id }}</td>
                               <td>{{ data.username }}</td>
+                              <td>{{ data.email }}</td>
+                              <td>{{ data.phone }}</td>
 
                               <td>
                                    <a href="{{ path('edit-user' , {id:data.id}) }}" class="btn btn-primary">Edit</a>

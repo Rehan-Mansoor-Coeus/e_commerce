@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Role;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Driver\PDO\Exception;
@@ -18,11 +19,10 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    /**
-     *
-     */
-    public function __construct(ManagerRegistry $registry)
+    private $roleRepository;
+    public function __construct(ManagerRegistry $registry , RoleRepository $roleRepository)
     {
+        $this->roleRepository = $roleRepository;
         parent::__construct($registry, User::class);
     }
 
@@ -60,7 +60,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * create user code
      *@return bool
      */
-    public function createUser($data , $passEncode):bool
+    public function createUser($data , $passEncode , $userType):bool
     {
         try{
         $user = new User();
@@ -69,6 +69,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPhone($data->getPhone());
         $user->setAddress($data->getAddress());
         $user->setLocale($data->getLocale());
+        if($userType==1){
+            $user->addRole($this->roleRepository->findOneBy(['roleName'=>'ROLE_SELLER']));
+        }
         $user->setPassword(
             $passEncode->encodePassword($user , $data->getPassword())
         );
@@ -81,6 +84,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             throw new Exception('You cannot Create this User', 201);
         }
     }
+
+
 
     /**
      * update user code
@@ -104,38 +109,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             $this->_em->flush();
             return true;
         }catch (\Exception $ex){
-            throw new Exception('You cannot Create this User', 201);
+            throw new Exception('You cannot Update this User', 201);
         }
     }
 
-
-
-    // /**
-    //  * @return User[] Returns an array of User objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?User
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
