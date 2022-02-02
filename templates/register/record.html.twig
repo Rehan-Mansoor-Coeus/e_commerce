@@ -24,7 +24,7 @@
                     <thead>
                     <tr class="bg-danger">
                          <th>ID</th>
-                         <th>Author</th>
+                         <th>User</th>
                          <th>Action</th>
                     </tr>
                     </thead>
@@ -35,7 +35,7 @@
                               <td>{{ data.username }}</td>
 
                               <td>
-{#                                   <a href="/edit-user/{{ data.id }}" class="btn btn-primary">Edit</a>#}
+                                   <a href="{{ path('edit-user' , {id:data.id}) }}" class="btn btn-primary">Edit</a>
                                    <a href="{{ path('delete-user' , {id:data.id}) }}" class="btn btn-danger">Del</a>
                               </td>
                          </tr>

@@ -106,6 +106,32 @@ class RegisterController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/user/edit/{id}", name="edit-user")
+     */
+    public function edit(Request $request , User $user , UserPasswordEncoderInterface $passEncode , UserRepository $userRepository)
+    {
+        $form = $this->createForm(UserType::class , $user );
+
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $data = $form->getData();
+
+            try{
+                $userRepository->updateUser($data,$passEncode , $user);
+                $this->addFlash('success', 'Author has been Updated!');
+            } catch (\Exception $ex) {
+                $this->addFlash('error', $ex->getMessage());
+            }
+
+            return $this->redirect($this->generateUrl('users'));
+        }
+
+        return $this->render('register/form.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
 
 
 

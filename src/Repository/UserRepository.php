@@ -82,6 +82,32 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         }
     }
 
+    /**
+     * update user code
+     *@return bool
+     */
+    public function updateUser($data , $passEncode , $user):bool
+    {
+        try{
+
+            $user->setUsername($data->getUsername());
+            $user->setEmail($data->getEmail());
+            $user->setPhone($data->getPhone());
+            $user->setAddress($data->getAddress());
+            $user->setLocale($data->getLocale());
+            $user->setPassword(
+                $passEncode->encodePassword($user , $data->getPassword())
+            );
+            $user->setCreated(new \DateTime(date('Y-m-d')));
+
+            $this->_em->persist($user);
+            $this->_em->flush();
+            return true;
+        }catch (\Exception $ex){
+            throw new Exception('You cannot Create this User', 201);
+        }
+    }
+
 
 
     // /**
