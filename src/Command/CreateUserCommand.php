@@ -66,6 +66,7 @@ class CreateUserCommand extends Command
             $user->setEmail(rand(100,500).'@gmail.com');
             $user->setPhone(rand(100000000,999999999));
             $user->setAddress(rand(100,999));
+            $user->setLocale('en');
             $user->setPassword(
                 password_hash($input->getArgument('password'), PASSWORD_DEFAULT)
             );

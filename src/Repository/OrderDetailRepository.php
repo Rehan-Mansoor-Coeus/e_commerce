@@ -14,37 +14,26 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class OrderDetailRepository extends ServiceEntityRepository
 {
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, OrderDetail::class);
     }
 
-    // /**
-    //  * @return OrderDetail[] Returns an array of OrderDetail objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('o')
-            ->andWhere('o.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('o.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+    /**
+     * create order detail
+     *@const $item $order
+     *@return true
+     */
+    public function createOrderDetail($item , $order):bool{
 
-    /*
-    public function findOneBySomeField($value): ?OrderDetail
-    {
-        return $this->createQueryBuilder('o')
-            ->andWhere('o.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $orderDetail = new OrderDetail();
+        $orderDetail->setProduct($item['product']);
+        $orderDetail->setOrderr($order);
+        $orderDetail->setPrice($item['product']->getPrice());
+        $orderDetail->setQuantiity($item['quantity']);
+        $this->_em->persist($orderDetail);
+        $this->_em->flush();
+        return true;
     }
-    */
 }

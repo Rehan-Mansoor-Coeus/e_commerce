@@ -6,9 +6,12 @@ use App\Entity\Order;
 use App\Entity\User;
 use App\Entity\OrderDetail;
 use App\Entity\Product;
+use App\Repository\OrderDetailRepository;
+use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
 use App\Service\MailService;
+use App\Service\OrderService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,7 +42,6 @@ class CartController extends AbstractController
     public function checkout(): Response
     {
         $session = new Session();
-
         return $this->render('cart/checkout.html.twig', [
             'cart' => $session->get('cart'),
         ]);
@@ -49,15 +51,13 @@ class CartController extends AbstractController
      * @Route("/checkout/complete", name="checkout-commplete")
      * @IsGranted("ROLE_USER")
      */
-    public function create(Request $request , MailerInterface $mailer, MailService $mail , UserRepository $userRepository , ProductRepository $productRepository)
+    public function create(MailerInterface $mailer, MailService $mail , UserRepository $userRepository , ProductRepository $productRepository , OrderRepository $orderRepository , OrderDetailRepository $detailRepository)
     {
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         $session = new Session();
 
-        $seller = [];
         $total = [];
-
         $index = 0;
 
         foreach ($session->get('cart') as $key=>$item) {
@@ -78,31 +78,19 @@ class CartController extends AbstractController
         $index2 = 0;
         foreach($cart as $ki=>$items){
 
-            $order = new Order();
-            $order->setTotal($total[$ki]);
-            $order->setStatus(0);
-            $order->setUser($user);
-            $order->setSeller($items[$index2]['seller']);
-            $order->setCreated(new \DateTime(date('Y-m-d')));
-            $em->persist($order);
-            $em->flush();
-
+            $total_amount =  $total[$ki];
+            $seller = $items[$index2]['seller'];
+            $order = $orderRepository->createOrder($seller,$user,$total_amount);
 
             foreach ($items as $key=>$item){
 
-                $orderDetail = new OrderDetail();
-                $orderDetail->setProduct($item['product']);
-                $orderDetail->setOrderr($order);
-                $orderDetail->setPrice($item['product']->getPrice());
-                $orderDetail->setQuantiity($item['quantity']);
-                $em->persist($orderDetail);
-                $em->flush();
+                $detailRepository->createOrderDetail($item,$order);
 
                 $product = $item['product'];
                 $product->setStock($product->getStock() - $item['quantity']);
                 $em->persist($product);
                 $em->flush();
-                $seller = $items[$index2]['seller'];
+
                 $index2 ++;
             }
 
@@ -124,14 +112,10 @@ class CartController extends AbstractController
             $mail->sendMail($to,$subject,$message,$mailer);
 
         }
-
-
-
         $session->clear();
         return $this->redirect('/complete/');
-
-
     }
+
     /**
      * @Route("/complete", name="complete")
      */
