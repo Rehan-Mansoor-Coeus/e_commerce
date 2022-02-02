@@ -1,5 +1,5 @@
 {% extends('/base.html.twig') %}
-
+{% block title %}My Account!{% endblock %}
 {% block body %}
 
 
@@ -29,7 +29,7 @@
                                     <td>{{ data.user.username }}</td>
                                     <td>{{ data.total }}</td>
                                     <td>{{ array[data.status] }}</td>
-                                    <td>{{ data.created }}</td>
+                                    <td>{{ data.created | ago }}</td>
 {#                                    <td>#}
 {#                                        <a href="/order/view/{{ data.id }}" class="btn btn-warning">View</a>#}
 {#                                    </td>#}

@@ -30,7 +30,7 @@ class OrderRepository extends ServiceEntityRepository
         $order->setStatus(0);
         $order->setUser($user);
         $order->setSeller($seller);
-        $order->setCreated(new \DateTime(date('Y-m-d')));
+        $order->setCreated(new \DateTime(date('Y-m-d H:i:s')));
 
         $this->_em->persist($order);
         $this->_em->flush();

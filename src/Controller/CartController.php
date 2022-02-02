@@ -24,6 +24,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CartController extends AbstractController
 {
+
     /**
      * @Route("/cart", name="cart")
      */
@@ -56,6 +57,11 @@ class CartController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         $session = new Session();
+        if($session->get('cart') == null){
+            $this->addFlash('error', 'You should add at least one product');
+             return $this->redirect('/cart');
+        }
+
 
         $result = $orderService->manageOrders($session->get('cart') , $user);
         $cart = $result[0];
@@ -114,14 +120,17 @@ class CartController extends AbstractController
      * @Route("/cart/plus/{id}", name="cart-plus")
      */
 
-    public function cartPlus($id)
+    public function cartPlus($id ,ProductRepository $productRepository)
     {
         $session = new Session();
         $cart = $session->get('cart');
-
-        if (isset($cart[$id])) {
-            $cart[$id]['quantity'] ++;
-            $session->set('cart',$cart);
+        if($productRepository->find($id)->getStock() != $cart[$id]['quantity']) {
+            if (isset($cart[$id])) {
+                $cart[$id]['quantity']++;
+                $session->set('cart', $cart);
+            }
+        }else{
+            $this->addFlash('error', 'Stock exceeded');
         }
 
         return $this->redirect('/cart');
@@ -135,10 +144,13 @@ class CartController extends AbstractController
     {
         $session = new Session();
         $cart = $session->get('cart');
-
-        if (isset($cart[$id])) {
-            $cart[$id]['quantity'] --;
-            $session->set('cart',$cart);
+        if($cart[$id]['quantity'] != 1){
+            if (isset($cart[$id])) {
+                $cart[$id]['quantity'] --;
+                $session->set('cart',$cart);
+            }
+        }else{
+            $this->addFlash('error', 'Quantity must be greater than 0 you can remove instead');
         }
 
         return $this->redirect('/cart');

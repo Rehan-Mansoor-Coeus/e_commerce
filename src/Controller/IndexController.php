@@ -3,22 +3,15 @@
 namespace App\Controller;
 use App\Bundle\CustomBundle\PaginationBundle;
 use App\Entity\Category;
-use App\Entity\Order;
-use App\Entity\Product;
 use App\Repository\CategoryRepository;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
-use Doctrine\ORM\Query\AST\LikeExpression;
-use Knp\Bundle\MarkdownBundle\MarkdownParserInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
 
@@ -26,7 +19,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class IndexController extends AbstractController
 {
 
-    private $security;
 
     /**
      * @Route("/admin", name="index")
