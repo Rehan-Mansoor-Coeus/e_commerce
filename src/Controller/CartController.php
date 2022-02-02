@@ -132,7 +132,6 @@ class CartController extends AbstractController
         }else{
             $this->addFlash('error', 'Stock exceeded');
         }
-
         return $this->redirect('/cart');
     }
 
@@ -152,7 +151,6 @@ class CartController extends AbstractController
         }else{
             $this->addFlash('error', 'Quantity must be greater than 0 you can remove instead');
         }
-
         return $this->redirect('/cart');
     }
 
@@ -167,7 +165,6 @@ class CartController extends AbstractController
         unset($cart[$id]);
         $session->set('cart',$cart);
         return $this->redirect('/cart');
-
     }
 
     /**
@@ -179,49 +176,18 @@ class CartController extends AbstractController
         $session = new Session();
         $cart = $session->get('cart');
 
-        if (!$cart) {
-            $cart = [
-                $id => [
-                    "name" => $product->getName(),
-                    "quantity" => 1,
-                    "price" => $product->getPrice(),
-                    "image" => $product->getImage(),
-                    "seller" => $product->getUser()->getId()
-                ]
-            ];
-            $session->set('cart',$cart);
-//            return $this->redirect('/home');
-            return new JsonResponse(['cart' => $session->get('cart')]);
-        }
-
-        // if cart not empty then check if this product exist then increment quantity
-
         if (isset($cart[$id])) {
-            $session->set('cart',$cart);
-            if ($session->has('cart')) {
-
-               $cart[$id]['quantity'] = $cart[$id]['quantity'] + 1;
-            }
-
-            $session->set('cart',$cart);
-//            return $this->redirect('/home');
-            return new JsonResponse(['cart' => $session->get('cart')]);
+              $cart[$id]['quantity'] = $cart[$id]['quantity'] + 1;
+        }else{
+            $cart[$id] = [
+                "name" => $product->getName(),
+                "quantity" => 1,
+                "price" => $product->getPrice(),
+                "image" => $product->getImage(),
+                "seller" => $product->getUser()->getId()
+           ];
         }
-
-        // if item not exist in cart then add to cart with quantity = 1
-        $cart[$id] = [
-            "name" => $product->getName(),
-            "quantity" => 1,
-            "price" => $product->getPrice(),
-            "image" => $product->getImage(),
-            "seller" => $product->getUser()->getId()
-
-        ];
         $session->set('cart',$cart);
-//        return $this->redirect('/home');
         return new JsonResponse(['cart' => $session->get('cart')]);
-
-
-
     }
 }
