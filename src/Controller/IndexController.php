@@ -37,6 +37,13 @@ class IndexController extends AbstractController
             'controller_name' => 'IndexController',
         ]);
     }
+    /**
+     * @Route("/error", name="error")
+     */
+    public function error(): Response
+    {
+        return $this->render('bundles/TwigBundle/Exception/error403.html.twig');
+    }
 
     /**
      * @Route("/products/{id}", name="product-category")

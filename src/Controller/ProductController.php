@@ -7,6 +7,7 @@ use App\Form\ProductType;
 use App\Repository\ProductRepository;
 use App\Service\ProductService;
 use Doctrine\DBAL\Exception;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -45,6 +46,7 @@ class ProductController extends AbstractController
 
     /**
      * @Route("/product/record", name="product-record")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function record(ProductRepository $product): Response
     {
