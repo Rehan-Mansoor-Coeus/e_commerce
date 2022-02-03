@@ -1,0 +1,60 @@
+{% extends('/base.html.twig') %}
+{% block title %} Cart {% endblock %}
+
+{% block body %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <table class="table table-striped table-bordered">
+                <thead class="bg-primary">
+                <tr>
+                    <th>Sr.</th>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% set total = 0 %}
+                {% for key,data in app.session.get('cart') %}
+                <tr>
+                    <td>{{ 1 }}</td>
+                    <td><img width="100px" src="/uploads/{{ data.image }}">{{ data.name }}</td>
+                    <td>
+                        <div class="qty-group">
+                            <a href="/cart/minus/{{ key }}" class="btn btn-warning">-</a>
+                            <input readonly="" type="text" name="quantity" size="10" id="updates_40341838725269" value="{{ data.quantity }}">
+                            <a class="btn btn-success" href="/cart/plus/{{ key }}">+
+                            </a>
+                        </div>
+                    </td>
+                    <td>{{ data.price }}</td>
+                    <td>
+                        <a href="/cart/remove/{{ key }}" class="btn btn-danger">Remove</a>
+                    </td>
+                </tr>
+                    {% set total = total + (data.price * data.quantity) %}
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="4" class="text-right"><h3>Total</h3></td>
+                    <td><h3 class="text-info">{{ total }} Rs </h3> </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="col-lg-12 col-sm-12 col-12 text-center ">
+            <a href="/checkout" class="btn btn-success">Checkout</a>
+        </div>
+    </div>
+
+
+{% endblock %}
+

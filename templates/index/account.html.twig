@@ -1,0 +1,59 @@
+{% extends('/base.html.twig') %}
+{% block title %}My Account!{% endblock %}
+{% block body %}
+
+
+    <div class="row">
+        <div class="col-md-9">
+            <div class="mt-lg-5">
+                <div class="card">
+                    <div class="card-header">
+                        <header>All Orders</header>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr class="bg-danger">
+                                <th>ID</th>
+                                <th>Buyer</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Date</th>
+{#                                <th>Action</th>#}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for data in result %}
+                                <tr>
+                                    <td>{{ data.id }}</td>
+                                    <td>{{ data.user.username }}</td>
+                                    <td>{{ data.total }}</td>
+                                    <td>{{ array[data.status] }}</td>
+                                    <td>{{ data.created | ago }}</td>
+{#                                    <td>#}
+{#                                        <a href="/order/view/{{ data.id }}" class="btn btn-warning">View</a>#}
+{#                                    </td>#}
+                                </tr
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="navigation float-right">
+                        {{ knp_pagination_render(result) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 sidebar-item">
+            <div class="nav flex-column nav-pills make-me-sticky" id="myTab" role="tablist" aria-orientation="vertical">
+                <a class="nav-link active" href="{{ path('home') }}">Home</a>
+
+                {% for data in category %}
+                <a class="nav-link"  href="/products/{{ data.id }}">{{ data.name | slice(0,20)}}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+

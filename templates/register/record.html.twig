@@ -1,6 +1,6 @@
 {% extends '/layout/base.html.twig' %}
 
-{% block title %}Create Tweet!{% endblock %}
+{% block title %}User Record!{% endblock %}
 
 {% block body %}
      {% for message in app.flashes('success') %}
@@ -8,17 +8,25 @@
                {{ message }}
           </div>
      {% endfor %}
+     {% for message in app.flashes('error') %}
+     <div class="alert alert-danger">
+          {{ message }}
+     </div>
+     {% endfor %}
      <div class="card">
           <div class="card-header">
-               <header>Auther Records</header>
-               <a class="btn btn-warning float-right" href="/user/create">Create</a>
+               <header>User Records</header>
+               <a class="btn btn-warning float-right" href="{{ path('user-create') }}">Create</a>
+
           </div>
           <div class="card-body">
                <table class="table table-bordered table-striped">
                     <thead>
                     <tr class="bg-danger">
                          <th>ID</th>
-                         <th>Author</th>
+                         <th>User</th>
+                         <th>Eamil</th>
+                         <th>Phone</th>
                          <th>Action</th>
                     </tr>
                     </thead>
@@ -27,10 +35,12 @@
                          <tr>
                               <td>{{ data.id }}</td>
                               <td>{{ data.username }}</td>
+                              <td>{{ data.email }}</td>
+                              <td>{{ data.phone }}</td>
 
                               <td>
-{#                                   <a href="/edit-user/{{ data.id }}" class="btn btn-primary">Edit</a>#}
-                                   <a href="/delete-user/{{ data.id }}" class="btn btn-danger">Del</a>
+                                   <a href="{{ path('edit-user' , {id:data.id}) }}" class="btn btn-primary">Edit</a>
+                                   <a href="{{ path('delete-user' , {id:data.id}) }}" class="btn btn-danger">Del</a>
                               </td>
                          </tr>
                     {% endfor %}

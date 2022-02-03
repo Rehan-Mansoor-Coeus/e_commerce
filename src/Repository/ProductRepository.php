@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -19,32 +20,59 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-    // /**
-    //  * @return Product[] Returns an array of Product objects
-    //  */
-    /*
-    public function findByExampleField($value)
+     /**
+      * finding products
+      * @param null|string $term
+      * @return Product[] Returns an array of Product objects
+      */
+
+    public function findAllWithSearch(?string $term)
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
+        $qb = $this->createQueryBuilder('c');
+
+        if($term){
+            $qb->andWhere('c.name LIKE :term OR c.description Like :term')
+                ->setParameter('term','%'.$term.'%')
+                ;
+        }
+        return $qb
+            ->orderBy('c.created','DESC')
             ->getQuery()
             ->getResult()
-        ;
-    }
-    */
+            ;
 
-    /*
-    public function findOneBySomeField($value): ?Product
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
     }
-    */
+
+    /**
+     *create product
+     */
+    public function createProduct($request , $product, $path, $user){
+
+        if($request->files->get('product')['image']) {
+            $file = $request->files->get('product')['image'];
+            $file_name = rand(100000, 999999) . '.' . $file->guessExtension();
+            $file->move($path, $file_name);
+            $product->setImage($file_name);
+        }
+        $product->setUser($user);
+        $product->setCreated(new \DateTime(date('Y-m-d')));
+
+        $this->_em->persist($product);
+        $this->_em->flush();
+    }
+
+    /**
+     *remove product
+     */
+    public function removeProduct(Product $user): bool
+    {
+        try{
+            $this->_em->remove($user);
+            $this->_em->flush();
+            return true;
+        }catch (\Exception $ex){
+            throw new Exception('You cannot delete this Product', 201);
+        }
+    }
+
 }

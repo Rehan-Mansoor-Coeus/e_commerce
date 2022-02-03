@@ -1,0 +1,60 @@
+{% extends '/layout/base.html.twig' %}
+
+{% block title %}Order Record!{% endblock %}
+
+{% block body %}
+     {% for message in app.flashes('danger') %}
+          <div class="alert alert-danger">
+               {{ message }}
+          </div>
+     {% endfor %}
+     {% for message in app.flashes('success') %}
+          <div class="alert alert-success">
+               {{ message }}
+          </div>
+     {% endfor %}
+     <div class="card">
+          <div class="card-header">
+               <header>All Orders ({{ pagination.getTotalItemCount }})</header>
+          </div>
+          <div class="card-body">
+               <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr class="bg-danger">
+                         <th>ID</th>
+                         <th>Seller</th>
+                         <th>Buyer</th>
+                         <th>Total</th>
+                         <th>Status</th>
+                         <th>Date</th>
+                         <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for data in pagination %}
+                         <tr>
+                              <td>{{ data.id }}</td>
+                              <td>{{ data.seller.username }}</td>
+                              <td>{{ data.user.username }}</td>
+                              <td>{{ data.total }}</td>
+                              <td>{{ array[data.status] }}</td>
+                              <td>{{ data.created }}</td>
+                              <td>
+                                   <a href="{{ path('order-view' , {id:data.id}) }}" class="btn btn-warning">View</a>
+                                   {% if(data.status == 0) %}
+                                        <a href="{{ path('order-edit' , {id:data.id}) }}" class="btn btn-primary">Edit</a>
+                                   {% endif %}
+                                   {# <a href="{{ path('order-delete' , {id:data.id}) }}" class="btn btn-danger">Del</a>#}
+                              </td>
+                         </tr
+                    {% endfor %}
+                    </tbody>
+               </table>
+               <div class="navigation float-right">
+                    {{ knp_pagination_render(pagination) }}
+               </div>
+          </div>
+
+     </div>
+
+{% endblock %}

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -17,6 +18,22 @@ class CategoryRepository extends AbstractEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Category::class);
+    }
+
+    /**
+     * @param Category $category
+     * @return bool
+     */
+    public function removeCategory(Category $category): bool
+    {
+        try{
+            $this->_em->remove($category);
+            $this->_em->flush();
+            return true;
+        }catch (\Exception $ex){
+            throw new Exception('You cannot delete this category', 201);
+        }
+
     }
 
     // /**

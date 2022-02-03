@@ -1,9 +1,9 @@
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
+    <a href="/admin" class="brand-link">
         <img src="/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-        <span class="brand-text font-weight-light">Coeus Tweet</span>
+        <span class="brand-text font-weight-light">Coeus Ecommerce</span>
     </a>
 
     <!-- Sidebar -->
@@ -48,20 +48,20 @@
 
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="/product" class="nav-link">
+                            <a href="{{ path('product') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Create</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/product/record/user" class="nav-link">
+                            <a href="{{ path('product-record-user') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Record</p>
                             </a>
                         </li>
                         {% if is_granted('ROLE_ADMIN') %}
                             <li class="nav-item">
-                                <a href="/product/record" class="nav-link">
+                                <a href="{{ path('product-record') }}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>All Record</p>
                                 </a>
@@ -70,8 +70,26 @@
 
                     </ul>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ path('order-record-user') }}" class="nav-link">
+                        <i class="nav-icon fas fa-copy"></i>
+                        <p>
+                            My Orders
+                            <span class="badge badge-info right">6</span>
+                        </p>
+                    </a>
+                </li>
 
                 {% if is_granted('ROLE_ADMIN') %}
+                    <li class="nav-item">
+                        <a href="{{ path('order-record') }}" class="nav-link">
+                            <i class="nav-icon fas fa-copy"></i>
+                            <p>
+                                All Orders
+                                <span class="badge badge-info right">6</span>
+                            </p>
+                        </a>
+                    </li>
                 <li class="nav-item">
                     <a href="" class="nav-link">
                         <i class="nav-icon fas fa-copy"></i>
@@ -84,13 +102,13 @@
 
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="/category" class="nav-link">
+                            <a href="{{ path('category') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Create</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/category/record" class="nav-link">
+                            <a href="{{ path('category-record') }}" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>All Record</p>
                             </a>
@@ -101,7 +119,7 @@
 
                 <li class="nav-header">Peoples</li>
                 <li class="nav-item">
-                    <a href="/users" class="nav-link">
+                    <a href="{{ path('users') }}" class="nav-link">
                         <i class="nav-icon fas fa-user-alt"></i>
                         <p>
                             Users
@@ -111,7 +129,7 @@
                 </li>
                 {% endif %}
                 <li class="nav-item">
-                    <a href="/logout" class="nav-link">
+                    <a href="{{ path('app_logout') }}" class="nav-link">
                         <i class="nav-icon far fa-circle text-danger"></i>
                         <p class="text">Logout</p>
                     </a>

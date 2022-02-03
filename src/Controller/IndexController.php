@@ -1,52 +1,51 @@
 <?php
 
 namespace App\Controller;
+use App\Bundle\CustomBundle\PaginationBundle;
 use App\Entity\Category;
-use App\Entity\Product;
-use Knp\Bundle\MarkdownBundle\MarkdownParserInterface;
-use Psr\Log\LoggerInterface;
+use App\Repository\CategoryRepository;
+use App\Repository\OrderRepository;
+use App\Repository\ProductRepository;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
-use App\Acme\TestBundle\AcmeTestBundle;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpFoundation\Request;
 
 
-/**
- * Require ROLE_ADMIN for all the actions of this controller
- *
- * @IsGranted("ROLE_USER")
- */
+
 
 
 class IndexController extends AbstractController
 {
 
-    private $security;
 
     /**
      * @Route("/admin", name="index")
-     *
-     *
      */
     public function index(): Response
     {
-
         return $this->render('index/index.html.twig', [
             'controller_name' => 'IndexController',
         ]);
     }
+    /**
+     * @Route("/error", name="error")
+     */
+    public function error(): Response
+    {
+        return $this->render('bundles/TwigBundle/Exception/error403.html.twig');
+    }
 
     /**
-     * @Route("/home", name="home")
+     * @Route("/products/{id}", name="product-category")
      */
-    public function home(): Response
+    public function productCategory(Category $category , ProductRepository $productRepository , CategoryRepository $categoryRepository): Response
     {
-        $em = $this->getDoctrine()->getManager();
-        $result = $em->getRepository(Product::class)->findAll();
-        $category = $em->getRepository(Category::class)->findAll();
+        $result = $productRepository->findBy([
+            'category' => $category
+        ]);
+        $category = $categoryRepository->findAll();
 
         return $this->render('index/home.html.twig', [
             'result' => $result,
@@ -55,64 +54,43 @@ class IndexController extends AbstractController
     }
 
     /**
-     * @Route("/logger", name="logger")
+     * @Route("/home", name="home")
      */
-    public function logger(LoggerInterface $logger)
+    public function home(Request $request , ProductRepository $productRepository , CategoryRepository $categoryRepository): Response
     {
-        $logger->info('Info Logger');
-        $logger->error('An error occurred');
-        $logger->critical('Critical error found!', [
-            // include extra "context" info in your logs
-            'cause' => 'bad coding ..!',
+
+        $q = $request->query->get('search');
+        if($q){
+            $result = $productRepository->findAllWithSearch($q);
+        }else{
+            $result = $productRepository->findAll();
+        }
+
+        $category = $categoryRepository->findAll();
+
+        return $this->render('index/home.html.twig', [
+            'result' => $result,
+            'category' => $category
         ]);
-
-        return new Response('logger practice');
-    }
-
-
-    /**
-     * @Route("/acme", name="acme")
-     */
-    public function acme(AcmeTestBundle $acme)
-    {
-        $acme = $acme->get('https://api.publicapis.org/entries');
-        $data = $acme['entries'];
-        dd(array_slice($data,1,10));
-
-        return new Response('logger practice');
     }
 
     /**
-     * @Route("/markdown", name="markdown")
+     * @Route("/account", name="account")
      */
-    public function markdown(MarkdownParserInterface $markdownParser)
+    public function account(PaginationBundle $page , PaginatorInterface $paginator ,OrderRepository $orderRepository , CategoryRepository $categoryRepository ,  Request $request): Response
     {
-       $data = "<h3>This is <b>H3</b> Tag</h3>";
-       $process_data = $markdownParser->transformMarkdown($data);
-
-        return $this->render('index/markdown.html.twig', [
-            'data' => $data ,
-            'markdown' => $process_data ,
+        $array = ['pending','complete','Rejected'];
+        $category = $categoryRepository->findAll();
+        $result = $orderRepository->findBy([
+            'user'=>$this->getUser()
         ]);
+        $result = $page->get($result,$paginator,$request);
 
-    }
-    /**
-     * @Route("/translation", name="translation")
-     */
-    public function translation(TranslatorInterface $translator )
-    {
-
-        $translated = $translator->trans(
-            'Symfony is great',
-            [],
-            'messages',
-            'fr_FR'
-        );
-
-        return $this->render('index/translated.html.twig', [
-            'translated' => $translated ,
+        return $this->render('index/account.html.twig', [
+            'result' => $result,
+            'array' => $array,
+            'category' => $category
         ]);
-
     }
 
 }

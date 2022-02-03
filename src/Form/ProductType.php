@@ -32,6 +32,7 @@ class ProductType extends AbstractType
             ->add('name',TextType::class)
             ->add('sku',TextType::class)
             ->add('price',IntegerType::class)
+            ->add('stock',IntegerType::class)
             ->add('category', EntityType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',

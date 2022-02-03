@@ -1,0 +1,25 @@
+{% extends '/layout/base.html.twig' %}
+
+{% block title %}Update User!{% endblock %}
+
+{% block body %}
+     {% for message in app.flashes('success') %}
+          <div class="alert alert-success">
+               {{ message }}
+          </div>
+     {% endfor %}
+     <div class="card">
+          <div class="card-header">
+               <header> Update User </header>
+               <a class="btn btn-primary float-right" href="{{ path('users') }}">Records</a>
+          </div>
+          <div class="card-body">
+               
+
+               {{ form_start(form) }}
+               {{ form_row(form.userType, { 'attr':{'disabled':'disabled'} }) }}
+               {{ form_end(form) }}
+          </div>
+     </div>
+
+{% endblock %}

@@ -3,8 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\UserType;
+use App\Repository\UserRepository;
+use Doctrine\DBAL\Driver\PDO\Exception;
 use Doctrine\DBAL\Types\TextType;
-//use http\Env\Request;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -23,41 +29,22 @@ class RegisterController extends AbstractController
     /**
      * @Route("/register", name="register")
      */
-    public function register(Request $request , UserPasswordEncoderInterface $passEncode)
+    public function register(Request $request , UserPasswordEncoderInterface $passEncode , UserRepository $userRepository)
     {
-        $form = $this->createFormBuilder()
-            ->add('username')
-            ->add('password' ,RepeatedType::class , [
-                'type' => PasswordType::class,
-                'required' => true ,
-                'first_options' => ['label' => 'Password'] ,
-                'second_options' => ['label' => 'Confirm Password'],
-                'constraints' => [new Assert\Length([
-                    'min' => 6,
-                    'max' => 8,
-                ])],
-            ])
-            ->add('Register' , SubmitType::class , [
-                'attr' => [
-                    'class' => 'btn btn-success float-right'
-                ]
-            ])
-            ->getForm();
+//        refactor 3
+        $user = new User();
+        $form = $this->createForm(UserType::class , $user , [
+            'action' => $this->generateUrl('register')
+        ]);
 
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $data = $form->getData();
-
-            $user = new User();
-            $user->setUsername($data['username']);
-            $user->setPassword(
-                $passEncode->encodePassword($user , $data['password'])
-            );
-            $user->setCreated(new \DateTime(date('Y-m-d')));
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($user);
-            $em->flush();
-
+            try{
+            $userRepository->createUser($data,$passEncode);
+            } catch (\Exception $ex) {
+                $this->addFlash('error', $ex->getMessage());
+            }
             return $this->redirect($this->generateUrl('app_login'));
         }
 
@@ -70,9 +57,8 @@ class RegisterController extends AbstractController
      * @Route("/users", name="users")
      */
 
-    public function user(){
-        $em = $this->getDoctrine()->getManager();
-        $user = $em->getRepository(User::class)->findAll();
+    public function user(UserRepository $user){
+        $user = $user->findAll();
 
         return $this->render('register/record.html.twig', [
             'user' => $user
@@ -82,61 +68,73 @@ class RegisterController extends AbstractController
     /**
      * @Route("/delete-user/{id}", name="delete-user")
      */
-    public function remove(int $id){
-        $em = $this->getDoctrine()->getManager();
-        $user = $em->getRepository(User::class)->find($id);
-        $em->remove($user);
-        $em->flush();
-
-        $this->addFlash('success', 'User has been Deleted!');
-
+    public function remove(User $user , UserRepository $userRepository){
+        // refactor 2
+        try{
+            if($user != $this->getUser()){
+                $userRepository->removeUser($user);
+                $this->addFlash('success', 'User has been Deleted!');
+            }else{
+                $this->addFlash('error', 'You cannot delete your self');
+            }
+        } catch (\Exception $ex) {
+            $this->addFlash('error', $ex->getMessage());
+        }
         return $this->redirectToRoute('users');
     }
-
 
     /**
      * @Route("/user/create", name="user-create")
      */
-    public function create(Request $request , UserPasswordEncoderInterface $passEncode)
+    public function create(Request $request , UserPasswordEncoderInterface $passEncode , UserRepository $userRepository)
     {
-        $form = $this->createFormBuilder()
-            ->add('username')
-            ->add('password' ,RepeatedType::class , [
-                'type' => PasswordType::class,
-                'required' => true ,
-                'first_options' => ['label' => 'Password'] ,
-                'second_options' => ['label' => 'Confirm Password'],
-                'constraints' => [new Assert\Length([
-                    'min' => 6,
-                    'max' => 8,
-                    ])]
-            ])
-            ->add('Register' , SubmitType::class , [
-                'attr' => [
-                    'class' => 'btn btn-success float-right'
-                ]
-            ])
-            ->getForm();
+        $user = new User();
+        $form = $this->createForm(UserType::class , $user , [
+            'action' => $this->generateUrl('user-create')
+        ]);
+
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $data = $form->getData();
+            $userType = $form['userType']->getData();
+
+            try{
+                $userRepository->createUser($data,$passEncode,$userType);
+                $this->addFlash('success', 'New User has been Created!');
+            } catch (\Exception $ex) {
+                $this->addFlash('error', $ex->getMessage());
+            }
+
+            return $this->redirect($this->generateUrl('users'));
+        }
+
+        return $this->render('register/form.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
+    /**
+     * @Route("/user/edit/{id}", name="edit-user")
+     */
+    public function edit(Request $request , User $user , UserPasswordEncoderInterface $passEncode , UserRepository $userRepository)
+    {
+        $form = $this->createForm(UserType::class , $user );
 
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $data = $form->getData();
 
-            $user = new User();
-            $user->setUsername($data['username']);
-            $user->setPassword(
-                $passEncode->encodePassword($user , $data['password'])
-            );
-            $user->setCreated(new \DateTime(date('Y-m-d')));
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($user);
-            $em->flush();
-            $this->addFlash('success', 'New Author has been Created!');
+            try{
+                $userRepository->updateUser($data,$passEncode , $user);
+                $this->addFlash('success', 'User has been Updated!');
+            } catch (\Exception $ex) {
+                $this->addFlash('error', $ex->getMessage());
+            }
+
             return $this->redirect($this->generateUrl('users'));
         }
 
-
-        return $this->render('register/form.html.twig', [
+        return $this->render('register/edit.html.twig', [
             'form' => $form->createView()
         ]);
     }
