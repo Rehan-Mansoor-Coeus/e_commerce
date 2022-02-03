@@ -23,25 +23,25 @@ class OrderService
     public function manageOrders($carts,$user){
 
         $total = [];
+        $sellers = [];
         $cart = [];
         $index = 0;
 
         foreach ($carts as $key=>$item) {
-            $seller = $this->userRepository->find($item['seller']);
+
             $product = $this->productRepository->find($key);
 
             $cart[$item['seller']][$index] = [
                 "product" => $product,
                 "quantity" => $item['quantity'],
-                "buyyer" => $user,
-                "seller" => $seller,
             ];
+            $sellers[$item['seller']] = $item['seller'];
             @$total[$item['seller']] += $item['price'] * $item['quantity'];
             $index++;
         }
 
 
-        return [$cart,$total];
+        return [$cart,$total,$sellers];
     }
 
 }

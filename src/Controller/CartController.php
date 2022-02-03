@@ -62,19 +62,18 @@ class CartController extends AbstractController
              return $this->redirect('/cart');
         }
 
-
         $result = $orderService->manageOrders($session->get('cart') , $user);
         $cart = $result[0];
         $total = $result[1];
+        $sellers = $result[2];
 
-        $index2 = 0;
-        foreach($cart as $ki=>$items){
-
+       foreach($cart as $ki=>$items){
             $total_amount =  $total[$ki];
-            $seller = $items[$index2]['seller'];
+            $seller = $userRepository->find($sellers[$ki]);
+
             $order = $orderRepository->createOrder($seller,$user,$total_amount);
 
-            foreach ($items as $key=>$item){
+            foreach ($items as $item){
                 $detailRepository->createOrderDetail($item,$order);
 
                 $product = $item['product'];
@@ -82,7 +81,6 @@ class CartController extends AbstractController
                 $em->persist($product);
                 $em->flush();
 
-                $index2 ++;
             }
 
 //            mail to buyer
@@ -94,7 +92,6 @@ class CartController extends AbstractController
             $mail->sendMail($to,$subject,$message,$mailer);
 
 //            mail to Seller
-
             $to = $seller->getEmail();
             $customer = $seller->getUsername();
             $order_no = $order->getId();
