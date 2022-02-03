@@ -62,7 +62,7 @@ class CartController extends AbstractController
              return $this->redirect('/cart');
         }
 
-        $result = $orderService->manageOrders($session->get('cart') , $user);
+        $result = $orderService->manageOrders($session->get('cart'));
         $cart = $result[0];
         $total = $result[1];
         $sellers = $result[2];
@@ -174,7 +174,9 @@ class CartController extends AbstractController
         $cart = $session->get('cart');
 
         if (isset($cart[$id])) {
-              $cart[$id]['quantity'] = $cart[$id]['quantity'] + 1;
+            if($product->getStock() != $cart[$id]['quantity']) {
+                $cart[$id]['quantity'] = $cart[$id]['quantity'] + 1;
+            }
         }else{
             $cart[$id] = [
                 "name" => $product->getName(),

@@ -13,6 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
+
 class CreateUserCommand extends Command
 {
     // the name of the command (the part after "bin/console")
@@ -22,7 +23,13 @@ class CreateUserCommand extends Command
     private $entityManager;
     private $roleRepository;
 
-    public function __construct(bool $requirePassword = false , bool $requireUsername = false ,EntityManagerInterface $entityManager ,RoleRepository $roleRepository)
+    /**
+     * @param bool $requirePassword
+     * @param bool $requireUsername
+     * @param EntityManagerInterface $entityManager
+     * @param RoleRepository $roleRepository
+     */
+    public function __construct(bool $requirePassword = false , bool $requireUsername = false , EntityManagerInterface $entityManager , RoleRepository $roleRepository)
     {
         $this->entityManager = $entityManager;
         $this->requireUsername = $requireUsername;
@@ -32,6 +39,9 @@ class CreateUserCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
@@ -42,6 +52,11 @@ class CreateUserCommand extends Command
 
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output ): int
     {
 
@@ -60,6 +75,10 @@ class CreateUserCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     * @param $input
+     * @return bool|string
+     */
     private function createUser($input)
     {
         try{

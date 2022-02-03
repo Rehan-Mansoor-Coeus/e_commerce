@@ -8,12 +8,23 @@ use Symfony\Component\Mime\Email;
 class MailService
 {
     private $logger;
+
+    /**
+     * @param LoggerInterface $logger
+     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
-    public function sendMail($to,$subject,$message,$mailer): string
+    /**
+     * @param $to
+     * @param $subject
+     * @param $message
+     * @param $mailer
+     * @return bool
+     */
+    public function sendMail($to, $subject, $message, $mailer): bool
     {
         $email = (new Email())
             ->from('rehan.mansoor@coeus-solutions.de')

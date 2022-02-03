@@ -71,8 +71,12 @@ class RegisterController extends AbstractController
     public function remove(User $user , UserRepository $userRepository){
         // refactor 2
         try{
-            $userRepository->removeUser($user);
-            $this->addFlash('success', 'User has been Deleted!');
+            if($user != $this->getUser()){
+                $userRepository->removeUser($user);
+                $this->addFlash('success', 'User has been Deleted!');
+            }else{
+                $this->addFlash('error', 'You cannot delete your self');
+            }
         } catch (\Exception $ex) {
             $this->addFlash('error', $ex->getMessage());
         }

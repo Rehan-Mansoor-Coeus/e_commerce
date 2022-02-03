@@ -12,6 +12,10 @@ use Exception;
  */
 class OrderService
 {
+    /**
+     * @param ProductRepository $productRepository
+     * @param UserRepository $userRepository
+     */
     public function __construct(ProductRepository $productRepository , UserRepository $userRepository)
     {
         $this->productRepository = $productRepository;
@@ -20,7 +24,11 @@ class OrderService
     }
 
 
-    public function manageOrders($carts,$user){
+    /**
+     * @param $carts
+     * @return array[]
+     */
+    public function manageOrders($carts){
 
         $total = [];
         $sellers = [];

@@ -11,11 +11,18 @@ class UserLocaleSubscriber implements EventSubscriberInterface
 
     private $session;
 
+    /**
+     * @param SessionInterface $session
+     */
     public function __construct(SessionInterface $session)
     {
         $this->session = $session;
     }
 
+    /**
+     * @param InteractiveLoginEvent $event
+     * @return void
+     */
     public function onLogin(InteractiveLoginEvent $event)
     {
         $user = $event->getAuthenticationToken()->getUser();
@@ -25,6 +32,9 @@ class UserLocaleSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @return \array[][]
+     */
     public static function getSubscribedEvents()
     {
         return [
