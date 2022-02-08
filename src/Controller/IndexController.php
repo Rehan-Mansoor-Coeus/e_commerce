@@ -14,11 +14,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
-/**
- * Require ROLE_ADMIN for all the actions of this controller
- *
- * @IsGranted("ROLE_USER")
- */
 
 
 class IndexController extends AbstractController
@@ -38,7 +33,22 @@ class IndexController extends AbstractController
             'controller_name' => 'IndexController',
         ]);
     }
+    /**
+     * @Route("/products/{id}", name="product-category")
+     */
+    public function productCategory(Category $category): Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $result = $em->getRepository(Product::class)->findBy([
+            'category' => $category
+        ]);
+        $category = $em->getRepository(Category::class)->findAll();
 
+        return $this->render('index/home.html.twig', [
+            'result' => $result,
+            'category' => $category
+        ]);
+    }
     /**
      * @Route("/home", name="home")
      */

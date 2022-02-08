@@ -5,6 +5,9 @@ namespace App\Controller;
 use App\Entity\User;
 use Doctrine\DBAL\Types\TextType;
 //use http\Env\Request;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -27,6 +30,9 @@ class RegisterController extends AbstractController
     {
         $form = $this->createFormBuilder()
             ->add('username')
+            ->add('email',EmailType::class)
+            ->add('phone',NumberType::class)
+            ->add('address' ,  TextareaType::class)
             ->add('password' ,RepeatedType::class , [
                 'type' => PasswordType::class,
                 'required' => true ,
@@ -50,6 +56,9 @@ class RegisterController extends AbstractController
 
             $user = new User();
             $user->setUsername($data['username']);
+            $user->setEmail($data['email']);
+            $user->setPhone($data['phone']);
+            $user->setAddress($data['address']);
             $user->setPassword(
                 $passEncode->encodePassword($user , $data['password'])
             );
@@ -101,6 +110,9 @@ class RegisterController extends AbstractController
     {
         $form = $this->createFormBuilder()
             ->add('username')
+            ->add('email',EmailType::class)
+            ->add('phone',NumberType::class)
+            ->add('address' ,  TextareaType::class)
             ->add('password' ,RepeatedType::class , [
                 'type' => PasswordType::class,
                 'required' => true ,
@@ -124,6 +136,9 @@ class RegisterController extends AbstractController
 
             $user = new User();
             $user->setUsername($data['username']);
+            $user->setEmail($data['email']);
+            $user->setPhone($data['phone']);
+            $user->setAddress($data['address']);
             $user->setPassword(
                 $passEncode->encodePassword($user , $data['password'])
             );

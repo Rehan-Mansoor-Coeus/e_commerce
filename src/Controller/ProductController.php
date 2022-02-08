@@ -115,7 +115,7 @@ class ProductController extends AbstractController
      */
     public function edit(product $product ,Request $request , $id): Response
     {
-        $this->denyAccessUnlessGranted('EDIT', $product);
+//        $this->denyAccessUnlessGranted('EDIT', $product);
 
 
         $form = $this->createForm(ProductType::class , $product);
